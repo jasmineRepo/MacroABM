@@ -7,10 +7,10 @@ import jasmine.model.MacroModel;
 import org.apache.log4j.Logger;
 
 public class APrioriAdjustments {
-	/* INTRODUCTORY NOTES: the adjustments (a priori or a posteriorio) follows a kind of dynamic programming approach. Because firms have preferences (production
-	 over investment; internal funds over external borrowing), they start to adjust first on the variable that they like the less. If they still do not match the
+	/* INTRODUCTORY NOTES: the adjustments (a priori or a posteriori) follows a kind of dynamic programming approach. Because firms have preferences (production
+	 over investment; internal funds over external borrowing), they start to adjust first on the variable that they like the least. If they still do not match the
 	 payment condition, then they move to the second least preferred variables, and so on. The objective is therefore payment = 0, the constraint are the resource
-	 constraints (i.e. the maximal possibe loan and the stock of liquid assets are given), and the choice variables are (a) substitutionnary investment, (b) 
+	 constraints (i.e. the maximal possible loan and the stock of liquid assets are given), and the choice variables are (a) substitutionnary investment, (b) 
 	 expansionary investments, (c) production -- ranked from the least to the most preferred. 
 	
 	 Remark: the payment function is linear in these three variables, however not continuous because it features several jumps. It is therefore easily possible
@@ -57,7 +57,7 @@ public class APrioriAdjustments {
 		
 		if(dInvSubStar > 0.){
 			
-			/* The goal is to invoke the mean value theorem: payment is monotically decreasing in inv. (regardless of their nature). Hence check whether at the minimal 
+			/* The goal is to invoke the mean value theorem: payment is monotonically decreasing in inv. (regardless of their nature). Hence check whether at the minimal 
 			level of sub. inv., i.e. dInvSubStar = 0, the payment is expected to be positive. If so, there exists an interior solution such that payment = 0. Otherwise,
 			adjusting on sub. inv. is not sufficient and c-firms move to the next adjustment round.
 			*/

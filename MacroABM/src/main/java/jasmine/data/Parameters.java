@@ -6,8 +6,8 @@ public class Parameters {
 	
 		//Scheduling
 		public static final int MODEL_ORDERING = 0;
-		public static final int COLLECTOR_ORDERING = Order.AFTER_ALL.getOrdering()-1;
-		public static final int OBSERVER_ORDERING = Order.AFTER_ALL.getOrdering();
+		public static final int COLLECTOR_ORDERING = Order.AFTER_ALL.getOrdering();		//Observer calls updates of cross-sectional objects and functions, so should be fired BEFORE the collector class!
+		public static final int OBSERVER_ORDERING = Order.AFTER_ALL.getOrdering()-1;		//Observer calls updates of cross-sectional objects and functions, so should be fired BEFORE the collector class!
 		
 		// If true, run the estimation procedure. Otherwise, use the parameters presented in Dosi et al. 2013 (appendix)
 		public static final boolean ESTIMATION_OF_PARAMETERS = false;

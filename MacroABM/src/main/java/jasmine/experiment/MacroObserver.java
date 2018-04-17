@@ -96,10 +96,10 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 						
 			if(!dosiComparison){
 				
-				updateChartSet = new LinkedHashSet<JInternalFrame>();	//Set of all charts needed to be scheduled for updating (NOT the convergence plot!)
+				updateChartSet = new LinkedHashSet<JInternalFrame>();	//Set of all charts needed to be scheduled for updating
 				tabSet = new LinkedHashSet<JComponent>();		//Set of all JInternalFrames each having a tab.  Each tab frame will potentially contain more than one chart each.
 
-				
+		        //Create chart containing time-series' of log GDP, log consumption and log total investment
 				TimeSeriesSimulationPlotter logOutputConsumptionInvestment = new TimeSeriesSimulationPlotter("Aggregate Time Series", "Log");
 				logOutputConsumptionInvestment.addSeries("Log GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogGDP));
 				logOutputConsumptionInvestment.addSeries("Log Consumption", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionLog));
@@ -109,6 +109,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			    tabSet.add(logOutputConsumptionInvestment);
 //				GuiUtils.addWindow(logOutputConsumptionInvestment, 0, 0, 300, 250);
 				
+			    //Create chart containing time-series' of credit supply and demand
 				TimeSeriesSimulationPlotter bankMarket = new TimeSeriesSimulationPlotter("Credit Activity", "Log");
 				bankMarket.addSeries("Credit Supply (log)", (IDoubleSource) new MultiTraceFunction.Double(bank, Bank.Variables.LogCreditSupply));
 				bankMarket.addSeries("Credit Demand (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogCreditDemand));
@@ -125,6 +126,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 //				GuiUtils.addWindow(creditRationing, 300, 0, 300, 250);
 				
 			    
+			    //Two charts under one tab, because data in charts have different scales
 			    Set<JInternalFrame> debtPlots = new LinkedHashSet<JInternalFrame>();
 				TimeSeriesSimulationPlotter debt = new TimeSeriesSimulationPlotter("Debt", "");
 				debt.addSeries("Bad debt (cFirm sector)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.BadDebt));
@@ -140,7 +142,10 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				badDebt.addSeries("Bad debt (bank)", (IDoubleSource) new MultiTraceFunction.Double(bank, Bank.Variables.BadDebt));
 				updateChartSet.add(badDebt);			//Add to set to be updated in buildSchedule method
 				debtPlots.add(badDebt);
-				tabSet.add(createScrollPaneFromPlots(debtPlots, "Debt", 2));
+				//The observer's createScrollPaneFromPlots() method arranges layout for multiple charts side-by-side
+				tabSet.add(createScrollPaneFromPlots(debtPlots, "Debt", debtPlots.size()));		//Add to set of charts to feature in tabbed pane
+
+
 			    
 			    
 			    
@@ -199,7 +204,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				capitalProd.addSeries("Top Machine Productivity", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.TopProdMachine));	//was labelled 'Top Prod Capital'. 
 				updateChartSet.add(capitalProd);			//Add to set to be updated in buildSchedule method
 				productivityPlots.add(capitalProd);
-				tabSet.add(createScrollPaneFromPlots(productivityPlots, "Technology (R&D)", 2));
+				tabSet.add(createScrollPaneFromPlots(productivityPlots, "Technology (R&D)", productivityPlots.size()));
 			    
 			    
 				TimeSeriesSimulationPlotter profit = new TimeSeriesSimulationPlotter("Total Profit", ""); 
@@ -244,7 +249,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				laborMarketUnemployment.addSeries("Unemployment Rate", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.UnemploymentRate));
 				updateChartSet.add(laborMarketUnemployment);			//Add to set to be updated in buildSchedule method
 				laborMarketPlots.add(laborMarketUnemployment);
-				tabSet.add(createScrollPaneFromPlots(laborMarketPlots, "Labor Market", 2));
+				tabSet.add(createScrollPaneFromPlots(laborMarketPlots, "Labor Market", laborMarketPlots.size()));
 			    
 			    
 				TimeSeriesSimulationPlotter exit = new TimeSeriesSimulationPlotter("Firm Exits", "# per time-step");
@@ -276,10 +281,11 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			    
 			    //-------------------------------------------------------------------------------------------------------
 			    //
-		    	//	BUILD A TABBED PANE HOLDING ALL THE CHARTS THAT ONLY UPDATE AT EACH TIME-STEP (not convergence plots)
+		    	//	BUILD A TABBED PANE HOLDING ALL THE CHARTS THAT ONLY UPDATE AT EACH TIME-STEP
 			    //
 		    	//-------------------------------------------------------------------------------------------------------
 			    
+		        //Create tabbed pane to hold all the charts and add to the JAS-mine GUI window
 		    	JInternalFrame chartsFrame = new JInternalFrame("Charts");
 				JTabbedPane tabbedPane = new JTabbedPane();
 				chartsFrame.add(tabbedPane);
@@ -367,6 +373,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			    //
 		    	//-------------------------------------------------------------------------------------------------------
 			    
+		        //Create tabbed pane to hold all the charts and add to the JAS-mine GUI window
 		    	JInternalFrame chartsFrame = new JInternalFrame("Charts");
 				JTabbedPane tabbedPane = new JTabbedPane();
 				chartsFrame.add(tabbedPane);

@@ -63,7 +63,7 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 	@GUIparameter(description = "Use a fixed random seed to start (pseudo) random number generator")
 	boolean fixRandomSeed 				= true;
 	@GUIparameter(description = "Seed of the (pseudo) random number generator if fixed")
-	Long seedIfFixed 					= 1l;
+	Long seedIfFixed 					= 1166517026l;
 	
 
 	// --- Define static variables for variables that are global to the economy & constant ---

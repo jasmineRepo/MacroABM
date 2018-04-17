@@ -66,8 +66,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	public double laborDemand_kFirms; // labor demand k-sector, was laborDemandCapital.
 	public CrossSection.Double csLaborDemand_cFirms;	//was csLaborDemandCons.
 	public SumArrayFunction fSumLaborDemand_cFirms;		//was fSumLaborDemandCons.
-	public CrossSection.Double csLaborDemand_kFirms;	//was csLaborDemandCapital.
-	public SumArrayFunction fSumLaborDemand_kFirms;		//was fSumLaborDemandCapital.
+	public CrossSection.Double csLaborDemandForProduction_kFirms;	//was csLaborDemandCapital.
+	public SumArrayFunction fSumLaborDemandForProduction_kFirms;		//was fSumLaborDemandCapital.
 	
 	public double laborDemandForRandD; // labor demand only for R&D purpose, was laborDemandRd.
 	public CrossSection.Double csLaborDemandForRd;	//was csLaborDemandRd.
@@ -263,7 +263,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		csProductivity_kFirms 						= new CrossSection.Double(model.getKFirms(), KFirm.class, "getProductivityNow", true);
 		csMachineProductivity 					= new CrossSection.Double(model.getKFirms(), KFirm.class, "getProdMachine", true);
 		csLaborDemand_cFirms				= new CrossSection.Double(model.getCFirms(), Firm.class, "getLaborDemand", true);
-		csLaborDemand_kFirms			= new CrossSection.Double(model.getKFirms(), KFirm.class, "getLaborDemandForProduction", true);
+		csLaborDemandForProduction_kFirms			= new CrossSection.Double(model.getKFirms(), KFirm.class, "getLaborDemandForProduction", true);
 		csLaborDemandForRd 				= new CrossSection.Double(model.getKFirms(), KFirm.class, "getLaborDemandForRd", true);
 		csPastPrice_cFirms 				= new CrossSection.Double(model.getCFirms(), Firm.class, "getPriceOfGoodProducedPrevious", true);
 		csPresentPrice_cFirms 				= new CrossSection.Double(model.getCFirms(), Firm.class, "getPriceOfGoodProducedNow", true);
@@ -300,7 +300,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		fMeanVarianceLiquidityToSalesRatio_cFirms		= new MeanVarianceArrayFunction(csLiquidityToSalesRatio_cFirms);
 		
 		fSumLaborDemand_cFirms 			= new SumArrayFunction.Double(csLaborDemand_cFirms);
-		fSumLaborDemand_kFirms 			= new SumArrayFunction.Double(csLaborDemand_kFirms);
+		fSumLaborDemandForProduction_kFirms 			= new SumArrayFunction.Double(csLaborDemandForProduction_kFirms);
 		fSumLaborDemandForRd 				= new SumArrayFunction.Double(csLaborDemandForRd);
 		fSumTotalProduction_cFirms 				= new SumArrayFunction.Double(csTotalProduction_cFirms);
 		fSumTotalProduction_kFirms 			= new SumArrayFunction.Double(csTotalProduction_kFirms);
@@ -315,7 +315,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		fSumBadDebt_cFirms						= new SumArrayFunction.Double(csBadDebt_cFirms);
 		
 		fSumLaborDemand_cFirms.setCheckingTime(false);
-		fSumLaborDemand_kFirms.setCheckingTime(false);
+		fSumLaborDemandForProduction_kFirms.setCheckingTime(false);
 		fSumLaborDemandForRd.setCheckingTime(false);
 		
 	}
