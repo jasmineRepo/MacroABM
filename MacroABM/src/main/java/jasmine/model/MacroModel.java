@@ -93,6 +93,7 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 	// Manager methods
 	// ---------------------------------------------------------------------
 	
+	@Override
 	public void buildObjects() {
 
 		// Calibrate the model. 
@@ -171,6 +172,7 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 				
 	}
 
+	@Override
 	public void buildSchedule() {
 		EventGroup eventGroup = new EventGroup();
 		

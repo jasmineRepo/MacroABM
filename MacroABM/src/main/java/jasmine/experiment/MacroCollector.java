@@ -242,6 +242,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	// Manager methods
 	// ---------------------------------------------------------------------
 
+	@Override
 	public void buildObjects() {
 		
 		// Initialize the statistics object
@@ -320,6 +321,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		
 	}
 
+	@Override
 	public void buildSchedule() {
 	
 		EventGroup eventGroup = new EventGroup();

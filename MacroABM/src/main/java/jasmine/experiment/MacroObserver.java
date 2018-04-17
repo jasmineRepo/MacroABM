@@ -86,6 +86,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 	// Manager methods
 	// ---------------------------------------------------------------------
 
+	@Override
 	public void buildObjects() {
 		
 		final MacroCollector collector = (MacroCollector) getCollectorManager();
@@ -394,6 +395,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 		
 	}
 
+	@Override
 	public void buildSchedule() {
 //		EventGroup eventGroup = new EventGroup();
 
