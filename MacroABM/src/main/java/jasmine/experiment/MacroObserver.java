@@ -402,11 +402,11 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 		if(charts){
 			if(!dosiComparison){
 				
-				EventGroup chartingEvents = new EventGroup();
+				EventGroup observerEventGroup = new EventGroup();
 				for(JInternalFrame plot: updateChartSet) {
-					chartingEvents.addEvent(plot, CommonEventType.Update);
+					observerEventGroup.addEvent(plot, CommonEventType.Update);
 				}
-				getEngine().getEventQueue().scheduleRepeat(chartingEvents, 0, Parameters.OBSERVER_ORDERING, chartUpdatePeriod);
+				getEngine().getEventQueue().scheduleRepeat(observerEventGroup, 0, Parameters.OBSERVER_ORDERING, chartUpdatePeriod);
 				
 //				eventGroup.addEvent(logOutputConsumptionInvestment, CommonEventType.Update);
 //				eventGroup.addEvent(bankMarket, CommonEventType.Update);
@@ -428,11 +428,11 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				
 			} else {
 				
-				EventGroup chartingEvents = new EventGroup();
+				EventGroup observerEventGroup = new EventGroup();
 				for(JInternalFrame plot: updateChartSetDosiCompare) {
-					chartingEvents.addEvent(plot, CommonEventType.Update);
+					observerEventGroup.addEvent(plot, CommonEventType.Update);
 				}
-				getEngine().getEventQueue().scheduleRepeat(chartingEvents, 0, Parameters.OBSERVER_ORDERING, chartUpdatePeriod);
+				getEngine().getEventQueue().scheduleRepeat(observerEventGroup, 0, Parameters.OBSERVER_ORDERING, chartUpdatePeriod);
 				
 //				eventGroup.addEvent(logOutputConsumptionInvestment, CommonEventType.Update);
 //				eventGroup.addEvent(logInvestments, CommonEventType.Update);

@@ -324,20 +324,20 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	@Override
 	public void buildSchedule() {
 	
-		EventGroup eventGroup = new EventGroup();
+		EventGroup collectorEventGroup = new EventGroup();
 
-		eventGroup.addEvent(this, Processes.DumpStatistics);
+		collectorEventGroup.addEvent(this, Processes.DumpStatistics);
 		if(exportBankData) {
-			eventGroup.addEvent(this, Processes.DumpBank);
+			collectorEventGroup.addEvent(this, Processes.DumpBank);
 		}
 		if(exportFirmsData){
 			// export data on firms only if wiling to obtain individual information on them 
-			eventGroup.addEvent(this, Processes.DumpCFirms);
-			eventGroup.addEvent(this, Processes.DumpKFirms);
+			collectorEventGroup.addEvent(this, Processes.DumpCFirms);
+			collectorEventGroup.addEvent(this, Processes.DumpKFirms);
 		}		
 		
 		// Note: store information only after the burn-in phase 
-		getEngine().getEventQueue().scheduleRepeat(eventGroup, initialTimestepsToIgnore, Parameters.COLLECTOR_ORDERING, timestepsBetweenSnapshots);
+		getEngine().getEventQueue().scheduleRepeat(collectorEventGroup, initialTimestepsToIgnore, Parameters.COLLECTOR_ORDERING, timestepsBetweenSnapshots);
 
 	}
 

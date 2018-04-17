@@ -174,7 +174,7 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 
 	@Override
 	public void buildSchedule() {
-		EventGroup eventGroup = new EventGroup();
+		EventGroup modelEventGroup = new EventGroup();
 		
 		/* Overall schedule:
 		 			(1) Exit and entry of consumption & capital-good firms
@@ -198,68 +198,68 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 		copy of current incumbents. K-firms with no clients exit as well, and are replaced in the same fashion.
 		Note: entry & exit take place at the beginning of the schedule so that exiting firms are recorded in the database before they die. 
 		 */
-		eventGroup.addEvent(this, Processes.Exit);
-		eventGroup.addEvent(this, Processes.Entry);
+		modelEventGroup.addEvent(this, Processes.Exit);
+		modelEventGroup.addEvent(this, Processes.Entry);
 		
 		// Entities update their variables (e.g. set some of them equal to 0, or update their optimal prices, the credit supply)
-		eventGroup.addEvent(collector, MacroCollector.Processes.Update);
-		eventGroup.addCollectionEvent(kFirms, KFirm.Processes.Update); 
-		eventGroup.addCollectionEvent(cFirms, CFirm.Processes.Update); 
-		eventGroup.addEvent(bank, Bank.Processes.Update); 
+		modelEventGroup.addEvent(collector, MacroCollector.Processes.Update);
+		modelEventGroup.addCollectionEvent(kFirms, KFirm.Processes.Update); 
+		modelEventGroup.addCollectionEvent(cFirms, CFirm.Processes.Update); 
+		modelEventGroup.addEvent(bank, Bank.Processes.Update); 
 		
 		// Capital-good firms undertake their R&D activity. The collector updates the aggregate variables  
-		eventGroup.addCollectionEvent(kFirms, KFirm.Processes.Research);
-		eventGroup.addEvent(collector, MacroCollector.Processes.TechFrontier); 
+		modelEventGroup.addCollectionEvent(kFirms, KFirm.Processes.Research);
+		modelEventGroup.addEvent(collector, MacroCollector.Processes.TechFrontier); 
 		
 		// Capital-good firms send brochures to consumption-good firms to promote their machines. Consumption-good firms choose their supplier
-		eventGroup.addCollectionEvent(kFirms, KFirm.Processes.Brochure);
-		eventGroup.addCollectionEvent(cFirms, CFirm.Processes.ChooseSupplier);
+		modelEventGroup.addCollectionEvent(kFirms, KFirm.Processes.Brochure);
+		modelEventGroup.addCollectionEvent(cFirms, CFirm.Processes.ChooseSupplier);
 		
 		/* Consumption-good firms form their initial plans given their demand expectation. Initially, financial constraints are not taken 
 		 into account. Then, they consider their borrowing capacity, which may lead to downward adjustments (a priori adjustments) */
-		eventGroup.addCollectionEvent(cFirms, CFirm.Processes.InitialExpenditures);
-		eventGroup.addCollectionEvent(cFirms, CFirm.Processes.APrioriAdjustments);
+		modelEventGroup.addCollectionEvent(cFirms, CFirm.Processes.InitialExpenditures);
+		modelEventGroup.addCollectionEvent(cFirms, CFirm.Processes.APrioriAdjustments);
 		
 		/* The bank observes the aggregate credit demand. If it exceeds its credit supply, the economy is credit rationed. The bank then 
 		 sorts firms depending on their net worth to sale ratio. 
 		 Once firms have received their loan and know their actual resources, they update their production and investment plans.
 		 With their level of investment known, consumption-good firms send their orders to their suppliers. */
-		eventGroup.addEvent(bank, Bank.Processes.CreditAllocation);
-		eventGroup.addCollectionEvent(cFirms, CFirm.Processes.ExpendituresUpdate);
-		eventGroup.addCollectionEvent(cFirms, CFirm.Processes.InvestmentOrder);
+		modelEventGroup.addEvent(bank, Bank.Processes.CreditAllocation);
+		modelEventGroup.addCollectionEvent(cFirms, CFirm.Processes.ExpendituresUpdate);
+		modelEventGroup.addCollectionEvent(cFirms, CFirm.Processes.InvestmentOrder);
 		
 		/* Hidden assumption in Dosi et al. (2013): the production function is of the Leontieff form. Thus, if the (aggregate) 
 		 labor demand exceeds the labor supply, firms scale down their production plans. */
-		eventGroup.addCollectionEvent(cFirms, CFirm.Processes.LaborDemand);
-		eventGroup.addCollectionEvent(kFirms, KFirm.Processes.LaborDemand);
-		eventGroup.addEvent(this, Processes.LaborMarket);
+		modelEventGroup.addCollectionEvent(cFirms, CFirm.Processes.LaborDemand);
+		modelEventGroup.addCollectionEvent(kFirms, KFirm.Processes.LaborDemand);
+		modelEventGroup.addEvent(this, Processes.LaborMarket);
 		
 		/* Capital market. 
 		 		1. Once the actual level of investment is determined (i.e. the level of investment that can be funded and produced), 
 		 		consumption-good firms pay their supplier and capital-good firms deliver the machines. 
 		 		2. Consumption-good firms scrap the machines they are able to replace. */
-		eventGroup.addCollectionEvent(cFirms, CFirm.Processes.MachineScrapping);		//Note that Hugo claims scrapping machines before production has no effect on the production in this time-step (see notes above). 
-		eventGroup.addCollectionEvent(kFirms, KFirm.Processes.MachineProduction);		//ROSS: Capital Machines should only be available at the end of the time-step in which they were ordered, according to the Dosi papers!
+		modelEventGroup.addCollectionEvent(cFirms, CFirm.Processes.MachineScrapping);		//Note that Hugo claims scrapping machines before production has no effect on the production in this time-step (see notes above). 
+		modelEventGroup.addCollectionEvent(kFirms, KFirm.Processes.MachineProduction);		//ROSS: Capital Machines should only be available at the end of the time-step in which they were ordered, according to the Dosi papers!
 		
 		/* Good market. 
 				1. Consumption-good firms undertake their production process
 				2. The competitiveness of each firm is determined
 				3. The consumption allocation starts, determining the demand & the sales of consumption-good firms */
-		eventGroup.addCollectionEvent(cFirms, CFirm.Processes.Production);		
+		modelEventGroup.addCollectionEvent(cFirms, CFirm.Processes.Production);		
 //		eventGroup.addCollectionEvent(kFirms, KFirm.Processes.MachineProduction);		//ROSS: Capital Machines should only be available at the end of the time-step in which they were ordered, so perhaps this should be placed here in the schedule, after the cFirms do their production.  Note that we put the production here before exit of firms to ensure kFirms provide all machines that were ordered by cFirms before their exit. 
-		eventGroup.addEvent(this, Processes.GoodMarketCompetitiveness); 
-		eventGroup.addEvent(this, Processes.ConsumptionAllocation); 
+		modelEventGroup.addEvent(this, Processes.GoodMarketCompetitiveness); 
+		modelEventGroup.addEvent(this, Processes.ConsumptionAllocation); 
 		
 		// Firms in both sectors compute their profit, their new stock of liquid assets, and pay their debt, if any. 
-		eventGroup.addCollectionEvent(kFirms, KFirm.Processes.Accounting); 
-		eventGroup.addCollectionEvent(cFirms, CFirm.Processes.Accounting);
-		eventGroup.addEvent(bank, Bank.Processes.Accounting);
+		modelEventGroup.addCollectionEvent(kFirms, KFirm.Processes.Accounting); 
+		modelEventGroup.addCollectionEvent(cFirms, CFirm.Processes.Accounting);
+		modelEventGroup.addEvent(bank, Bank.Processes.Accounting);
 		
 		// Compute the macroeconomic variables. Store them in the MacroStatistics class to then export them in the .csv file
-		eventGroup.addEvent(collector, MacroCollector.Processes.AggregateComputation);
-		eventGroup.addEvent(collector, MacroCollector.Processes.DumpInStatistics);
+		modelEventGroup.addEvent(collector, MacroCollector.Processes.AggregateComputation);
+		modelEventGroup.addEvent(collector, MacroCollector.Processes.DumpInStatistics);
 		
-		getEngine().getEventQueue().scheduleRepeat(eventGroup, 0., Parameters.MODEL_ORDERING, 1.);
+		getEngine().getEventQueue().scheduleRepeat(modelEventGroup, 0., Parameters.MODEL_ORDERING, 1.);
 		
 		//For termination of simulation
 //		getEngine().getEventQueue().scheduleOnce(new SingleTargetEvent(this, Processes.End), endTime, Order.AFTER_ALL.getOrdering());
