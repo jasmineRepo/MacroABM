@@ -58,7 +58,7 @@ public class Bank extends Agent implements IDoubleSource {
 	public double debtInterest;
 	
 	@Transient
-	Map<CFirm, Double> creditQueue; // map that surveys the firms with positive credit demand, and their net-worth-to-sale ratio
+	Map<CFirm, Double> creditMap; // map that surveys the firms with positive credit demand, and their net-worth-to-sale ratio
 	
 	// ---------------------------------------------------------------------
 	// EventListener
@@ -146,7 +146,7 @@ public class Bank extends Agent implements IDoubleSource {
 		
 		this.key = new PanelEntityKey(bankIdCounter++);
 				
-		this.creditQueue 						= new LinkedHashMap<>();
+		this.creditMap 						= new LinkedHashMap<>();
 		
 		// Note: only the liquid assets of consumption-good firms are taken into account.
 		this.monetaryBase 						= Parameters.getNetLiquidAssets_cFirms() * ((double) model.getNumberOfCFirms());
@@ -178,7 +178,7 @@ public class Bank extends Agent implements IDoubleSource {
 
 	void update(){
 		
-		this.creditQueue.clear();
+		this.creditMap.clear();
 		
 		// In Dosi et al. implementation, only deposits of consumption-good firms are taken into account to compute the total level of credit 
 		this.monetaryBase 						= 0;
@@ -208,7 +208,7 @@ public class Bank extends Agent implements IDoubleSource {
 		
 		// Compute the aggregate credit demand
 		collector.aggregateCreditDemand 		= 0;
-		for(CFirm cFirm : creditQueue.keySet()){
+		for(CFirm cFirm : creditMap.keySet()){
 			collector.aggregateCreditDemand 	+= cFirm.creditDemand;
 		}
 		
@@ -218,7 +218,7 @@ public class Bank extends Agent implements IDoubleSource {
 			log.debug("Agg. demand < agg. supply");
 			
 			// Each firm receives its credit demand
-			for(CFirm cFirm : creditQueue.keySet()){
+			for(CFirm cFirm : creditMap.keySet()){
 				if(model.myopicDebtRepayment){
 					cFirm.loan 					= cFirm.creditDemand;
 					cFirm.myopicExpendituresUpdate();
@@ -230,10 +230,10 @@ public class Bank extends Agent implements IDoubleSource {
 		} 
 		else {
 			// Sort the consumption-good firms by their net worth to sale ratio 
-			creditQueue = (Map<CFirm, Double>) MapSorting.sortByValueDescending(creditQueue);
+			creditMap = (Map<CFirm, Double>) MapSorting.sortByValueDescending(creditMap);
 			log.debug("Agg. demand > agg. supply. Initial credit remaining: " + totalCreditRemaining);
 			
-			for(CFirm cFirm : creditQueue.keySet()){
+			for(CFirm cFirm : creditMap.keySet()){
 				
 				if(totalCreditRemaining < 0){
 					totalCreditRemaining 		= 0;

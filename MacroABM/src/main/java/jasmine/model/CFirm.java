@@ -11,8 +11,7 @@ import jasmine.data.Parameters;
 import jasmine.object.*;
 import microsim.data.db.PanelEntityKey;
 import microsim.engine.SimulationEngine;
-import microsim.statistics.IDoubleSource;
-
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Transient;
@@ -20,7 +19,7 @@ import javax.persistence.Transient;
 import org.apache.log4j.Logger;
 
 @Entity
-public class CFirm extends Firm implements IDoubleSource {
+public class CFirm extends Firm {
 
 	private final static Logger log = Logger.getLogger(CFirm.class);
 	
@@ -63,6 +62,7 @@ public class CFirm extends Firm implements IDoubleSource {
 
 	protected double investment; // investment, was inv.
 
+	@Column(name = "Expansionary_Investment")
 	protected double investmentExpansionary; // expansionary investment, was invExp. 
 
 	protected double investmentSubstitutionary; // substitutionary investment, was invSub.
@@ -180,7 +180,7 @@ public class CFirm extends Firm implements IDoubleSource {
 				aPrioriFeasibilityPseudoRational();
 				expectedPayment();
 			}
-			model.getBank().creditQueue.put(this, netWorthToSalesRatio);
+			model.getBank().creditMap.put(this, netWorthToSalesRatio);
 			break;
 			
 		case ExpendituresUpdate:
@@ -2067,12 +2067,10 @@ public class CFirm extends Firm implements IDoubleSource {
 	}
 	
 	public double getBadDebt(){
-//		System.out.println("CFirm.getBadDebt(), " + badDebt);
 		return badDebt;
 	}
 
 	public double getNetWorthToSalesRatio() {
-//		System.out.println("CFirm.getNetWorthToSalesRatio(), " + netWorthToSalesRatio);
 		return netWorthToSalesRatio;
 	}
 
@@ -2080,28 +2078,4 @@ public class CFirm extends Firm implements IDoubleSource {
 		return key;
 	}
 
-	
-	// ---------------------------------------------------------------------
-	// implements IDoubleSource for use with Regression classes
-	// ---------------------------------------------------------------------	
-	
-	public enum DoubleVariables {
-		NetWorthToSales,
-	}
-	
-	@Override
-	public double getDoubleValue(Enum<?> variableID) {
-
-		switch ((DoubleVariables) variableID) {
-		
-		case NetWorthToSales:
-			System.out.println("CFirm.getNetWorthToSalesRatio(), " + netWorthToSalesRatio);
-			return netWorthToSalesRatio;
-			
-		default:
-			throw new IllegalArgumentException("Unknown DoubleVariable " + variableID.name() + " in CFirms#getDoubleValue method");
-		}
-
-	}
-	
 }

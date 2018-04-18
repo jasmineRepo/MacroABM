@@ -282,8 +282,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 				
 		csRdExpenditures_kFirms 				= new CrossSection.Double(model.getKFirms(), KFirm.class, "getRdExpenditure", true);
 		csBadDebt_cFirms						= new CrossSection.Double(model.getCFirms(), CFirm.class, "getBadDebt", true);
-//		csLiquidityToSalesRatio_cFirms					= new CrossSection.Double(model.getCFirms(), CFirm.class, "getNetWorthToSalesRatio", true);
-		csLiquidityToSalesRatio_cFirms					= new CrossSection.Double(model.getCFirms(), CFirm.DoubleVariables.NetWorthToSales);
+		csLiquidityToSalesRatio_cFirms					= new CrossSection.Double(model.getCFirms(), CFirm.class, "getNetWorthToSalesRatio", true);
+//		csLiquidityToSalesRatio_cFirms					= new CrossSection.Double(model.getCFirms(), CFirm.DoubleVariables.NetWorthToSales);
 		 
 		// Create all the objects computing functions on the previous cross-sections (max, mean, sum etc.)
 		
