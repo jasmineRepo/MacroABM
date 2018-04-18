@@ -72,7 +72,7 @@ public class Parameters {
 		private static double coeffCPI_Wages; // inflation/cpi parameter, was psi2.
 		private static double coeffUnemployment_Wages; // unemployment parameter, was psi3.
 		private static double maxVariation_Wages; // max. variation of wage, ~ Dosi et al., was maxVarWage. 
-		private static double naturalLevelUnemployment; // natural level of unemployment, was uStar.
+		private static double naturalLevelUnemployment; // natural level of unemployment, was uStar.  This is a lower bound for the unemployment rate (to prevent divide by zero errors), which is used in the calculation of wage inflation.  The unemployment rate is reset to this level if it falls below it. 
 	
 	public static void initializationWithoutEstimation(){
 		// initialization of the parameter when all parameters are picked up manually (~ Dosi et al. calibration)

@@ -32,16 +32,21 @@ public class CFirm extends Firm implements IDoubleSource {
 	// here are all the variables specific to the c-forms
 	@Transient
 	BalanceSheetCFirm balanceSheet;
+	
 	@Transient
 	Set<KFirm> potentialKfirmsSet; // set of KFirm offers received by the firm.  These are the potential capital machine suppliers that the cFirms can use.  Was brochureLists. 
+	
 	@Transient
 	Map<Machine, Integer> machineAgeMap; // map which associates an age to each machine of the firm's machine set 
+	
 	@Transient
 	Map<Machine, Integer> machineQuantityMap; // map which gives the number of machines associated with the type of machine in the firm's machine set 
+	
 	@Transient
 	Map<Machine, Integer> machinesToBeScrappedMap; /* map surveying the machines that c-firms initially want to scrap, either because they are too old, or
 	 because they are not sufficiently productive. NOTE: such map is needed because it is possible that, eventually, c-firms will not scrap some of the machines
 	 if it was not able to invest in machines to replace them.  */
+
 	@Transient
 	KFirm supplier;
 
@@ -61,6 +66,7 @@ public class CFirm extends Firm implements IDoubleSource {
 	protected double investmentExpansionary; // expansionary investment, was invExp. 
 
 	protected double investmentSubstitutionary; // substitutionary investment, was invSub.
+
 	@Transient
 	protected double[] inventories; /* inventories, was n. An array is needed to compute the difference between past inventories and present one, 
 	in order to compute the gdp, see equation (11) in Dosi et al. (2013) */
@@ -1609,8 +1615,8 @@ public class CFirm extends Firm implements IDoubleSource {
 					// Increase the firm's demand by the corresponding amount
 					this.demand[1] 				+= demand;
 				else if (i == 1){
-					// Unfilled demand is nill 
-					this.unfilledDemand 		= 1;
+					// Unfilled demand is nil 
+					this.unfilledDemand 		= 1;		//XXX: Why is this 1 and not demand?  It seems it is to prevent divide by 0 errors.
 				}
 				
 				// The firm's stock of final good and the real consumption decrease accordingly
@@ -1621,7 +1627,7 @@ public class CFirm extends Firm implements IDoubleSource {
 				if(i > 1)
 					this.demand[1] 				+= stockFinalGood;
 				else if (i == 1)
-					this.unfilledDemand 		= 1 + demand - stockFinalGood;
+					this.unfilledDemand 		= 1 + demand - stockFinalGood;	//XXX Why the '1 + '?  It seems it is to prevent divide by 0 errors.
 				
 				// The stock of real consumption decreases accordingly
 				model.consumptionTemp 			-= stockFinalGood;

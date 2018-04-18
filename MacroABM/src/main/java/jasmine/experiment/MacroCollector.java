@@ -870,8 +870,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		
 	}
 	
-	public void priceIndexes(){
-		// Compute the price indexes 
+	public void priceIndices(){
+		// Compute the price indices 
 		
 		// Compute total production in both sectors 
 		fSumTotalProduction_kFirms.updateSource();
@@ -1072,7 +1072,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		
 		// Prevents the unemployment rate to be nil, which would make us divide by zero
 		if(unemploymentRate[0] < Parameters.getNaturalLevelUnemployment())
-			this.unemploymentRate[0] 				= Parameters.getNaturalLevelUnemployment();
+			this.unemploymentRate[0] 				= Parameters.getNaturalLevelUnemployment();			//XXX: Should we also update the 'unemployment' field?  Or even the laborDemand field for consistency?  Or this only used for calculating wage inflation and avoiding divide by zero errors?
 		
 		// Inputs for equation (10) in Dosi et al. (2013))
 		this.diffUnemploymentRate 						= (unemploymentRate[1] - unemploymentRate[0]) / unemploymentRate[0];
@@ -1238,7 +1238,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		this.timestepsBetweenSnapshots = timestepsBetweenSnapshots;
 	}
 	
-	public double getLaborDemandProd(){
+	public double getLaborDemandUsedForProduction(){
 		return laborDemandUsedForProduction;
 	}
 

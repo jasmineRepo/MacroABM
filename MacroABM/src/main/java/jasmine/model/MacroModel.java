@@ -49,7 +49,7 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 	@GUIparameter(description = "Loan-to-value ratio") 
 	Double loanToValueRatio 			= 2.;
 	@GUIparameter(description = "Unemployment benefit defined as the proportion of market wage")
-	Double unemploymentBenefitShare 	= 0.4;		//was minWage, XXX: Is this relabelling correct?
+	Double unemploymentBenefitShare 	= 0.4;		//was minWage
 	@GUIparameter(description = "Initial mark up rate for consumption-good firms")
 	Double markUpRate 						= 0.2;
 	@GUIparameter(description = "Tax rate on firms' profit")
@@ -371,8 +371,8 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 		/* INTRODUCTORY NOTES: the exit and entry process follows the logic of object-oriented programming. When a firm exits,
 		it is removed from the list of surviving firms, as well as all objects that are only linked to this firm. 
 		
-		Note on the structure of the method: when a capital-good firm looses all its clients because these latest exit the economy, 
-		then we assume that this capital-good firm leaves the market as well. Thus, the consumption-good firm exit process needs to 
+		Note on the structure of the method: when a capital-good firm loses all its clients because the clients exit the economy, 
+		then we assume that this capital-good firm also leaves the market as well. Thus, the consumption-good firm exit process needs to 
 		be coded before the capital-good firm exit one. 
 		
 		Because the exit process takes place at the beginning of the period (see the rationale above), every time series that are linked
@@ -390,7 +390,7 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 		for(CFirm cFirm : cFirms)
 			cFirm.survivalChecking();
 		
-		// If all consumption-good firms exit in a given period, then ends the simulation
+		// If all consumption-good firms exit in a given period, then the simulation terminates.
 		if(collector.cFirmsRemaining > 0){
 			// Remove from list c-firms that exit
 			for(Iterator<CFirm> it = cFirms.iterator(); it.hasNext();){
@@ -406,8 +406,9 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 				}
 			}
 		} else {
-			log.fatal("All consumption-good firms exit in the same period. Stop the simulation");
-			getEngine().getEventQueue().scheduleSystem(getEngine().getTime(), Order.BEFORE_ALL.getOrdering(), 0., getEngine(), SystemEventType.End);
+			throw new IllegalStateException("All consumption-good firms exit in the same period. Stop the simulation");
+//			log.fatal("All consumption-good firms exit in the same period. Stop the simulation");
+//			getEngine().getEventQueue().scheduleSystem(getEngine().getTime(), Order.BEFORE_ALL.getOrdering(), 0., getEngine(), SystemEventType.End);
 		}
 		
 		// Identify which capital-good firm exit
@@ -431,8 +432,9 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 				}
 			}
 		} else {
-			log.fatal("All k-firms are going to die in the same period --> stop the simulation");
-			getEngine().getEventQueue().scheduleSystem(getEngine().getTime(), Order.BEFORE_ALL.getOrdering(), 0., getEngine(), SystemEventType.End);
+			throw new IllegalStateException("All k-firms are going to die in the same period --> stop the simulation");
+//			log.fatal("All k-firms are going to die in the same period --> stop the simulation");
+//			getEngine().getEventQueue().scheduleSystem(getEngine().getTime(), Order.BEFORE_ALL.getOrdering(), 0., getEngine(), SystemEventType.End);
 		}
 		
 		log.fatal("Exit statistics: " +
@@ -515,10 +517,10 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 		
 		// The collector computes the aggregate labor demand
 		collector.laborDemandProd();
-		double laborDemandProd 				= collector.getLaborDemandProd();
+		double laborDemandProd 				= collector.getLaborDemandUsedForProduction();
 		
 		// Subtract from the total labor supply the R&D labor demand, already used  
-		double laborSupplyRemaining 		= 0;
+		double laborSupplyRemaining 		= 0.;
 		if(laborSupply >= collector.laborDemandForRandD)
 			laborSupplyRemaining 			= laborSupply - collector.laborDemandForRandD;
 		else 
@@ -615,7 +617,7 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 		
 		// 1. Compute aggregate consumption
 		collector.aggregateConsumption();
-		collector.priceIndexes();
+		collector.priceIndices();
 		collector.realConsumption 			= collector.consumption[1] / collector.cpi[1];
 		
 		/* 2. Allocate total consumption across the different consumption-good firms
@@ -646,7 +648,7 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 			for(CFirm cFirm : cFirms)
 				cFirm.demand(i);
 			
-			// Compute whether there is still firms in the market
+			// Compute whether there are still firms in the market
 			fTotTemp 						= 0;
 			for(CFirm cFirm : cFirms)
 				fTotTemp 					+= cFirm.marketShareTemp;
@@ -656,7 +658,7 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 			}
 			
 			collector.realConsumption 		= consumptionTemp;
-			i 								+= 1;
+			i++;
 		}
 		
 		// The past consumption is the real consumption that had not been met in the allocation process
