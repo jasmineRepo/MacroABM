@@ -207,14 +207,19 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				productivityPlots.add(capitalProd);
 				tabSet.add(createScrollPaneFromPlots(productivityPlots, "Technology (R&D)", productivityPlots.size()));
 			    
-			    
-				TimeSeriesSimulationPlotter profit = new TimeSeriesSimulationPlotter("Total Profit", ""); 
+				
+				Set<JInternalFrame> profitPlots = new LinkedHashSet<JInternalFrame>();
+				TimeSeriesSimulationPlotter profit = new TimeSeriesSimulationPlotter("Total Profit: Consumption & Capital Firms", ""); 
 				profit.addSeries("Consumption Firms sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.Profit_cFirms));
 				profit.addSeries("Capital Firms sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.Profit_kFirms));
-				profit.setName("Profit");
 				updateChartSet.add(profit);			//Add to set to be updated in buildSchedule method
-			    tabSet.add(profit);					//Tab will be created for this chart
-//				GuiUtils.addWindow(profit, 900, 250, 300, 250);
+				profitPlots.add(profit);				
+				TimeSeriesSimulationPlotter capitalProfit = new TimeSeriesSimulationPlotter("Capital Firm Profit", ""); 
+				capitalProfit.addSeries("Capital Firms sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.Profit_kFirms));
+				updateChartSet.add(capitalProfit);			//Add to set to be updated in buildSchedule method								
+				profitPlots.add(capitalProfit);
+			    tabSet.add(createScrollPaneFromPlots(profitPlots, "Profit", profitPlots.size()));					//Tab will be created for this chart
+
 				
 				TimeSeriesSimulationPlotter clientAndAge = new TimeSeriesSimulationPlotter("Machines: Clients & Age", "#"); 
 				clientAndAge.addSeries("Max Clients per Capital Firm", (IIntSource) new MultiTraceFunction.Integer(collector, MacroCollector.Variables.MaxClientsPerFirm_kFirms));
