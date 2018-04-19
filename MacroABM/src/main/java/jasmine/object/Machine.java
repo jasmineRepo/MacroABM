@@ -15,7 +15,7 @@ public class Machine implements Cloneable {
 	@Transient
 	double cost; // cost of the machine 
 	@Transient
-	double vintage; // vintage of the machine
+	double vintage; // vintage of the machine, this increases in increments of 1 whenever the KFirm innovates and creates a more efficient machine.
 	@Transient
 	KFirm madeBy;
 	

@@ -290,7 +290,7 @@ public class Bank extends Agent implements IDoubleSource {
 		} 
 		
 		
-		// If the economy has no debt, the bank is not doing any activity. Its profit is nil
+		// If the economy has no debt, the bank is not doing any activity. Its profit is nil.
 		if(this.debtInterest == 0)
 			this.profit 						= 0;
 		else 
@@ -324,15 +324,15 @@ public class Bank extends Agent implements IDoubleSource {
 			collector.govSpending 				+= badDebt;
 			this.badDebt 						= 0;
 			
-			/* POTENTIAL NEW VERSION
-			 this.badDebt						-= reserves;
-			 this.reserves						= 0;
-			 if(cash > 0)
-			 		this.badDebt				-= cash;
-			 this.cash							= 0;
-			 collector.govSpending				+= badDebt;
-			 this.badDebt						= 0;
-			 */
+//			// POTENTIAL NEW VERSION
+//			 this.badDebt						-= reserves;
+//			 this.reserves						= 0;
+//			 if(cash > 0)
+//			 		this.badDebt				-= cash;
+//			 this.cash							= 0;
+//			 collector.govSpending				+= badDebt;
+//			 this.badDebt						= 0;
+			 
 						
 			// If the cash of the bank is also negative, the government pays for it as well 
 			if(cash < 0){
@@ -350,16 +350,16 @@ public class Bank extends Agent implements IDoubleSource {
 			// FIXME: should not update equity accordingly ? Or cash? 
 			// NOTE: in Mason code, does not reset bad debt like this... Keep it positive, which is why it grows continuously
 			// until it burst and the government has to step in
-			this.badDebt 						= 0;		//XXX: In the charts, this makes the bad debt always 0!  Is this in the wrong place?  Because if it is not reset to 0, the chart gets a monotonically increasing amount of bad debt.  However, my (Ross) own bad debt chart that sums up the cFirms bad debt at each time-step is not monotonically increasing.  Perhaps this is because cFirm bad debt disappears if(when) the cFirm exits, whereas it doesn't disappear from the Bank's accounts, so just accumulates.  Which is the correct way?  I don't know... 
-			/* POTENTIAL NEW VERSION
-			 if(reserves > badDebt){
-			 	this.reserves					-= badDebt;
-			 } else {
-			 	this.cash						-= badDebt - reserves;
-			 	this.reserves					= 0;
-			 }
-			 this.badDebt						= 0;
-			 */
+			this.badDebt 						= 0;		//XXX: In the charts, this makes the Bank's bad debt always 0!  Is this in the wrong place?  Because if it is not reset to 0, the chart gets a monotonically increasing amount of bad debt.  However, my (Ross) own bad debt chart that sums up the cFirms bad debt at each time-step is not monotonically increasing.  Perhaps this is because cFirm bad debt disappears if(when) the cFirm exits, whereas it doesn't disappear from the Bank's accounts, so just accumulates.  Which is the correct way?
+//			// POTENTIAL NEW VERSION
+//			 if(reserves > badDebt){
+//			 	this.reserves					-= badDebt;
+//			 } else {
+//			 	this.cash						-= badDebt - reserves;
+//			 	this.reserves					= 0;
+//			 }
+//			 this.badDebt						= 0;
+
 			collector.bankDifficulty			= 0;
 		}
 		

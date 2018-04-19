@@ -14,7 +14,7 @@ import microsim.statistics.IDoubleSource;
 import microsim.statistics.IIntSource;
 import microsim.statistics.functions.MaxArrayFunction;
 import microsim.statistics.functions.MeanArrayFunction;
-import microsim.statistics.functions.MeanVarianceArrayFunction;
+//import microsim.statistics.functions.MeanVarianceArrayFunction;
 import microsim.statistics.functions.SumArrayFunction;
 
 import org.apache.log4j.Logger;
@@ -224,7 +224,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	
 	MacroModel model;
 
-	private MeanVarianceArrayFunction fMeanVarianceLiquidityToSalesRatio_cFirms;
+//	private MeanVarianceArrayFunction fMeanVarianceLiquidityToSalesRatio_cFirms;
 	
 	
 	// ---------------------------------------------------------------------
@@ -298,7 +298,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		fMeanLiquidAssets_cFirms	= new MeanArrayFunction(csLiquidAssets_cFirms);
 		fSumLiquidityToSalesRatio_cFirms 	= new SumArrayFunction.Double(csLiquidityToSalesRatio_cFirms);
 		fMeanLiquidityToSalesRatio_cFirms				= new MeanArrayFunction(csLiquidityToSalesRatio_cFirms);
-		fMeanVarianceLiquidityToSalesRatio_cFirms		= new MeanVarianceArrayFunction(csLiquidityToSalesRatio_cFirms);
+//		fMeanVarianceLiquidityToSalesRatio_cFirms		= new MeanVarianceArrayFunction(csLiquidityToSalesRatio_cFirms);
 		
 		fSumLaborDemand_cFirms 			= new SumArrayFunction.Double(csLaborDemand_cFirms);
 		fSumLaborDemandForProduction_kFirms 			= new SumArrayFunction.Double(csLaborDemandForProduction_kFirms);

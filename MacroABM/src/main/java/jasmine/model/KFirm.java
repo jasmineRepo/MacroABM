@@ -366,7 +366,7 @@ public class KFirm extends Firm {
 			// The potential discovery is a random sample from a beta distribution with parameters alpha1 and beta1
 			BetaDistribution betaDistribution 	= new BetaDistribution((RandomGenerator) SimulationEngine.getRnd(), Parameters.getAlpha1_Innovation_kFirms(), Parameters.getBeta1_Innovation_kFirms(), BetaDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
 			
-			// Machine productivity. Then scale the random s.t. it belongs to the appropriate support 
+			// Machine productivity. Then scale the random variable s.t. it belongs to the appropriate support 
 			double innovation 					= betaDistribution.sample();
 			innovation 							= Parameters.getX1lower_Innovation_kFirms() + innovation * 
 													( Parameters.getX1upper_Innovation_kFirms() - Parameters.getX1lower_Innovation_kFirms() );
@@ -374,7 +374,7 @@ public class KFirm extends Firm {
 			// Equation (15.5) in Dosi et al. (2013)
 			this.aInn 							= machineProduced.getA()[0] * (1 + innovation);
 			
-			// Firm's productivity. Then scale the random s.t. it belongs to the appropriate support 
+			// Firm's productivity. Then scale the random variable s.t. it belongs to the appropriate support 
 			innovation 							= betaDistribution.sample();
 			innovation 							= Parameters.getX1lower_Innovation_kFirms() + innovation * 
 													( Parameters.getX1upper_Innovation_kFirms() - Parameters.getX1lower_Innovation_kFirms() );
@@ -603,7 +603,7 @@ public class KFirm extends Firm {
 	
 	void machineProduction(){
 		// The firm produces the machines and delivers them to its clients, that pay it in exchange 
-		if(!bookOrder.isEmpty()){
+		if(!bookOrder.isEmpty()){		//XXX: Isn't this an unnecessary check?
 			for(Map.Entry<CFirm, Long> entry : bookOrder.entrySet()){
 				
 				machineDelivery(entry.getKey());

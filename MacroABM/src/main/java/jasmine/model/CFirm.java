@@ -538,10 +538,10 @@ public class CFirm extends Firm {
 			//NOTE: no need to add it to the supplier's clients list. This is done at the end of the method 
 		}
 		
-		// Consumption-good firms compare the brochures they received and choose the supplier the most competitive 
+		// Consumption-good firms compare the brochures they have received and choose the supplier that is most competitive 
 		KFirm oldSupplier 						= supplier;		
 		// If condition that ensures that we will not iterate over an empty list (e.g. might be the case for some new entrants)
-		if(!potentialKfirmsSet.isEmpty()){
+		if(!potentialKfirmsSet.isEmpty()){			//XXX: This check is unnecessary.
 			for(KFirm potentialSupplier : potentialKfirmsSet){
 				// Equation (17) in Dosi et al. (2013) measures a firm's competitiveness 
 				double realPriceOldSupplier 	= oldSupplier.priceOfGoodProduced[1] + Parameters.getMachinePaybackPeriod_cFirms() * oldSupplier.machineProduced.getCost();
@@ -680,7 +680,7 @@ public class CFirm extends Firm {
 	}
 	
 	// ---------------------------------------------------------------------
-	// A Priori Adjustments methods
+	// A Priori Adjustments methods - INVESTMENT DECISIONS
 	// ---------------------------------------------------------------------
 	
 		// ---------------------------------------------------------------------
@@ -710,7 +710,7 @@ public class CFirm extends Firm {
 			(a) preferences for production over investment, 
 			(b) preferences for internal funds over external ones  
 
-		// The firm deduces from its liquid assets the cost of production */
+		// The firm deducts from its liquid assets the cost of production */
 		this.liquidAssetRemainingAfterProductionAndInvestment 					-= costProduction;
 		if(liquidAssetRemainingAfterProductionAndInvestment < 0)
 			this.liquidAssetRemainingAfterProductionAndInvestment 				= 0;
@@ -879,7 +879,7 @@ public class CFirm extends Firm {
 		// collection of parameters to make the closed form solutions look less awful 
 		double param2 = Parameters.getDebtRepaymentSharePerPeriod_cFirms() + (1 - MacroModel.tax_rate) * MacroModel.interestRateOnDebt;
 		double salesTemp = priceOfGoodProduced[1] * Math.min(demand[0], desiredProductionStar + inventories[0]);
-		/* For clarification on the origin of salesTemp, see the code documentation pdf. Intuition: the firm cannot sell more than one what it has produced (current production
+		/* For clarification on the origin of salesTemp, see the code documentation pdf. Intuition: the firm cannot sell more than what it has produced (current production
 		 + stock of inventories), nor more than what its demand is. 
 		*/
 		
@@ -920,7 +920,7 @@ public class CFirm extends Firm {
 		} else {
 			// else, the firm already plan to use part, or all, of the loan at its disposal. Once more, there is several scenarios to consider:
 			
-			// (a): conditional on planing to use all the loan for production and investment purposes, does the firm expect to be able to repay its debt? 
+			// (a): conditional on planning to use all the loan for production and investment purposes, does the firm expect to be able to repay its debt? 
 			if(loanForProductionAndInvestment == maxPossibleLoan){
 				// recall than loanProd + loanDebt = maxLoan, by definition of the borrowing capacity of c-firms. Hence, loanDebt = 0
 				this.loanForDebtRepayment = 0;
@@ -938,8 +938,8 @@ public class CFirm extends Firm {
 					APrioriAdjustments.adjustmentsWithNilLiquidAsset(this);
 					
 				}
-			} /* (b): not all the loan is planed to be used for production & inv. expenditures. Thus, if needed, the firm can increase its credit demand to 
-			 meet the constraint (recall that the payment is monotically increasing in loandebt) */
+			} /* (b): not all the loan is planned to be used for production & inv. expenditures. Thus, if needed, the firm can increase its credit demand to 
+			 meet the constraint (recall that the payment is monotonically increasing in loan debt) */
 			else {
 				// (i) does the firm expect to be able to repay its debt, not borrowing further? 
 				if(balanceSheet.payment(desiredProductionStar, (long) (desiredInvestmentExpansionaryStar + desiredInvestmentSubstitionaryStar), 0, loanForProductionAndInvestment) > 0 ){
@@ -1369,7 +1369,7 @@ public class CFirm extends Firm {
 	}
 	
 	void feasibilityPositiveLoan(){
-		// NOTE: this method is exactly identical to the aPrioriFeasibilityPseudoRational() method, except that the firm based its decision on loan, instead of maxLoan
+		// NOTE: this method is exactly identical to the aPrioriFeasibilityPseudoRational() method, except that the firm bases its decision on loan, instead of maxLoan
 		
 		// re-initialize the variables to their original optimal levels
 		this.optimalProduction = desiredProduction;
@@ -1471,7 +1471,7 @@ public class CFirm extends Firm {
 		// Number of machines that can be replaced
 		int numberOfReplacement 				= (int) (investmentSubstitutionary / Parameters.getMachineSizeInCapital_cFirms());
 		
-		// Rank the machines, from the most to the least costly. The first machines will be have the highest cost 
+		// Rank the machines, from the most to the least costly. The first machine will be the one with the highest cost 
 		Map<Machine, Double> machineCost 		= new LinkedHashMap<>();
 		for(Machine machine : machinesToBeScrappedMap.keySet())
 			machineCost.put(machine, machine.getCost());
@@ -1645,7 +1645,7 @@ public class CFirm extends Firm {
 	void accounting(){
 		this.sales[1] 							= priceOfGoodProduced[1] * Math.min(productionQuantity + inventories[0], demand[1]);
 		this.size 								= Math.min(productionQuantity + inventories[0], demand[1]);
-		this.grossOperatingSurplus 								= sales[1] - costToProduceGood * productionQuantity;
+		this.grossOperatingSurplus 				= sales[1] - costToProduceGood * productionQuantity;
 		
 		double debtInterest 					= debt[1] * MacroModel.interestRateOnDebt;
 		model.getBank().debtInterest			+= debtInterest;
@@ -1653,9 +1653,9 @@ public class CFirm extends Firm {
 		model.getBank().depositRevenues			+= depositRevenue;
 		
 		this.profit 							= grossOperatingSurplus + depositRevenue - debtInterest;
-		this.inventories[1] 								= Math.max(0, stockFinalGood);
+		this.inventories[1] 					= Math.max(0, stockFinalGood);
 		double diffN 							= inventories[1] - inventories[0];
-		collector.diffTotalInventories 						+= diffN;
+		collector.diffTotalInventories 			+= diffN;
 		
 		double debtRepaid 						= Parameters.getDebtRepaymentSharePerPeriod_cFirms() * debt[1];
 		
@@ -1664,7 +1664,7 @@ public class CFirm extends Firm {
 				collector.govRevenues 			+= profit * model.taxRate;
 				this.liquidAsset[1]				+= (1 - model.taxRate ) * profit + productionQuantity;
 			} else {
-				this.liquidAsset[1]							+= profit + productionQuantity;
+				this.liquidAsset[1]				+= profit + productionQuantity;
 			}
 			
 			if(debt[1] > 0 && !exit){
@@ -1712,7 +1712,7 @@ public class CFirm extends Firm {
 				"\n loan debt " + loanForDebtRepayment + 
 				"\n debt " + debt[1]);
 		
-		// Then c-firms repay their debt, if any. Note that they can use their remainig loan debt to do so
+		// Then c-firms repay their debt, if any. Note that they can use their remaining loan debt to do so
 		if(liquidAsset[1] >= - Parameters.getErrorThreshold()){
 			if(loanForDebtRepayment > 0){
 				if(loanForDebtRepayment >= Parameters.getDebtRepaymentSharePerPeriod_cFirms() * debt[1]){

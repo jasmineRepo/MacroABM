@@ -1,13 +1,9 @@
 package jasmine.object;
 
-import org.apache.log4j.Logger;
-
 import jasmine.model.KFirm;
 import jasmine.model.MacroModel;
 
 public class BalanceSheetKFirm {
-	
-	private final static Logger log = Logger.getLogger(BalanceSheetKFirm.class);
 	
 	// the balance sheet can be considered as an accountant, or simply as an object, that collects all the financial information of a firm, and perform
 	// the computation related to it 
