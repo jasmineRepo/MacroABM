@@ -9,11 +9,13 @@ import microsim.engine.SimulationEngine;
 import microsim.engine.SimulationManager;
 import microsim.event.EventGroup;
 import microsim.event.EventListener;
+import microsim.gui.plot.TimeSeriesSimulationPlotter;
 import microsim.statistics.CrossSection;
 import microsim.statistics.IDoubleSource;
 import microsim.statistics.IIntSource;
 import microsim.statistics.functions.MaxArrayFunction;
 import microsim.statistics.functions.MeanArrayFunction;
+import microsim.statistics.functions.MultiTraceFunction;
 //import microsim.statistics.functions.MeanVarianceArrayFunction;
 import microsim.statistics.functions.SumArrayFunction;
 
@@ -421,7 +423,9 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		UnemploymentRate,
 		LogGDP,
 		LogTotalInvestment,
-		ConsumptionLog,
+//		ConsumptionLog,
+		ConsumptionToGDP,
+		InvestmentToGDP,
 		GdpGrowth,
 		TotalExpansionaryInvestment_cFirms,
 		TotalSubstitutionaryInvestment_cFirms,
@@ -447,11 +451,14 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		// TODO: can remove afterwards, only to understand better the model
 		LogProduction_cFirms,
 		TotalMarkUp_cFirms,
+		ProfitToGDP_cFirms,
 		LogProfit_cFirms,
 		LogProfit_kFirms,
 		Profit_kFirms,
+		ProfitToGDP_kFirms,
 		MaxClientsPerFirm_kFirms,
 		TotalInventories,
+		TotalInventoriesToGDP,
 		AverageAgeMachine_cFirms,
 		LogRandDexpenditures_kFirms,
 		LogConsumption,
@@ -470,6 +477,12 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		LogCapitalStockTopLimit,
 		LogDesiredExpansionaryInvestmentTotal_cFirms,
 		LogDesiredExpansionaryInvestmentTotalStar_cFirms,
+
+		ActualExpansionaryInvestmentToGDP_cFirms,
+		DesiredExpansionaryInvestmentToGDP_cFirms,
+		DesiredExpansionaryInvestmentStarToGDP_cFirms,
+		ActualSubsitionaryInvestmentToGDP_cFirms,
+
 		LaborDemand,
 		LogTopProdMachine,
 		LogTopProdLabor,
@@ -477,7 +490,13 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		LogBadDebt,
 		LogWage,
 //		Flag,
-		Empty;
+		Empty,
+		ExitPercent_kFirms,
+		ExitPercent_cFirms,
+		ExitPercentLiquidityIssue_cFirms,
+		ExitPercentMarketShareIssue_cFirms,
+		ExitPercentAssetMarket_cFirms,
+
 	}
  	
 	@Override
@@ -499,6 +518,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return this.avgAgeMachines_cFirms;
 		case TotalInventories:
 			return this.totalInventories;
+		case TotalInventoriesToGDP:
+			return this.totalInventories / gdp[1];
 		case TotalMarkUp_cFirms:
 			return this.markUpTot_cFirms;
 		case LogProfit_cFirms:
@@ -511,6 +532,16 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			else return Double.NaN;
 		case Profit_kFirms:
 			return this.profit_kFirms;
+
+		case ProfitToGDP_kFirms:
+			if(gdp[1] > 0)
+				return profit_kFirms / gdp[1];
+			else return Double.NaN;
+			
+		case ProfitToGDP_cFirms:
+			if(gdp[1] > 0)
+				return profit_cFirms / gdp[1];
+			else return Double.NaN;
 			
 		case LogConsumption:
 			if(consumption[1] > 0)
@@ -567,6 +598,28 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 				return Math.log(this.desiredExpansionaryInvestmentTotalStar_cFirms);
 			else 
 				return Double.NaN;
+			
+			
+		case ActualExpansionaryInvestmentToGDP_cFirms:
+			if(gdp[1] > 0)
+				return investmentExpansionaryTotal_cFirms / gdp[1];
+			else return Double.NaN;
+			
+		case DesiredExpansionaryInvestmentToGDP_cFirms:
+			if(gdp[1] > 0)
+				return desiredExpansionaryInvestmentTotal_cFirms / gdp[1];
+			else return Double.NaN;
+			
+		case DesiredExpansionaryInvestmentStarToGDP_cFirms:
+			if(gdp[1] > 0)
+				return desiredExpansionaryInvestmentTotalStar_cFirms / gdp[1];
+			else return Double.NaN;
+			
+		case ActualSubsitionaryInvestmentToGDP_cFirms:
+			if(gdp[1] > 0)
+				return investmentSubstitutionaryTotal_cFirms / gdp[1];
+			else return Double.NaN;
+			
 	
 		case LaborDemand:
 			return this.laborDemand;
@@ -595,6 +648,13 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			
 		case LogGDP:
 			return gdpLog;
+			
+		case ConsumptionToGDP:
+			return consumption[1] / gdp[1];
+			
+		case InvestmentToGDP:
+			return (investmentExpansionaryTotal_cFirms + investmentSubstitutionaryTotal_cFirms) / gdp[1];
+			
 		case LogTotalInvestment:
 			if(investmentExpansionaryTotal_cFirms + investmentSubstitutionaryTotal_cFirms > 0) {
 				return Math.log(investmentExpansionaryTotal_cFirms + investmentSubstitutionaryTotal_cFirms);
@@ -602,8 +662,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			else {
 				return Double.NaN;
 			}
-		case ConsumptionLog:
-			return Math.log(consumption[1]);
+//		case ConsumptionLog:
+//			return Math.log(consumption[1]);
 			
 		
 		case TotalExpansionaryInvestment_cFirms:
@@ -662,6 +722,19 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			
 		case Empty:
 			return Double.NaN;
+
+			
+		case ExitPercent_kFirms:
+			return 100. * exit_kFirms / (double)model.getKFirms().size();
+		case ExitPercent_cFirms:
+			return 100. * exit_cFirms / (double)model.getCFirms().size();
+		case ExitPercentLiquidityIssue_cFirms:
+			return 100. * exitLiquidityIssue_cFirms / (double)model.getCFirms().size();
+		case ExitPercentMarketShareIssue_cFirms:
+			return 100. * exitMarketShareIssue_cFirms / (double)model.getCFirms().size();
+		case ExitPercentAssetMarket_cFirms:
+			return 100. * exitAssetMarket_cFirms / (double)model.getCFirms().size();
+
 			
 		default: 
 			throw new IllegalArgumentException("Unsupported variable"); 
@@ -783,7 +856,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		this.diffTotalInventories 						= 0;
 		this.govRevenues 				= 0;
 		this.govSpending 				= 0;
-		this.diffTotalInventories 						= 0;
+//		this.diffTotalInventories 						= 0;
 		this.creditRationingRate_cFirms 		= 0;
 		
 //		this.flag						= 0;
