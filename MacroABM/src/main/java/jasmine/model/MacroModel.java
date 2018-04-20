@@ -18,6 +18,8 @@ import microsim.event.SystemEvent;
 import microsim.event.SystemEventType;
 
 import jasmine.data.Parameters;
+import jasmine.enums.DebtManagement;
+import jasmine.enums.DebtRepayment;
 import jasmine.experiment.MacroCollector;
 import jasmine.object.*;
 
@@ -56,10 +58,14 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 	Double taxRate 						= 0.1;
 	@GUIparameter(description = "Economy's interest rate")
 	Double interestRate 							= 0.025;
+//	@GUIparameter(description = "Determines how firms consider debt repayment")
+//	boolean myopicDebtRepayment 		= true;
 	@GUIparameter(description = "Determines how firms consider debt repayment")
-	boolean myopicDebtRepayment 		= true;
-	@GUIparameter(description = "Mason (if set to true) or Lhuillier (if set to false) version for debt management")
-	boolean mason						= true;
+	DebtRepayment debtRepayment = DebtRepayment.Myopic;
+//	@GUIparameter(description = "Mason (if set to true) or Lhuillier (if set to false) version for debt management")
+//	boolean mason						= true;
+	@GUIparameter(description = "Sets the version of debt management for the simulation")
+	DebtManagement debtManagement		= DebtManagement.Dosi_Et_Al;
 	@GUIparameter(description = "Use a fixed random seed to start (pseudo) random number generator")
 	boolean fixRandomSeed 				= true;
 	@GUIparameter(description = "Seed of the (pseudo) random number generator if fixed")
@@ -774,13 +780,13 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 		return bank;
 	}
 
-	public boolean isMyopicDebtRepayment() {
-		return myopicDebtRepayment;
-	}
-
-	public void setMyopicDebtRepayment(boolean myopicDebtRepayment) {
-		this.myopicDebtRepayment = myopicDebtRepayment;
-	}
+//	public boolean isMyopicDebtRepayment() {
+//		return myopicDebtRepayment;
+//	}
+//
+//	public void setMyopicDebtRepayment(boolean myopicDebtRepayment) {
+//		this.myopicDebtRepayment = myopicDebtRepayment;
+//	}
 
 	public static double getrDepo() {
 		return returnOnFirmsDeposits;
@@ -814,13 +820,13 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 		return tax_rate;
 	}
 
-	public boolean isMason() {
-		return mason;
-	}
-
-	public void setMason(boolean mason) {
-		this.mason = mason;
-	}
+//	public boolean isMason() {
+//		return mason;
+//	}
+//
+//	public void setMason(boolean mason) {
+//		this.mason = mason;
+//	}
 
 	public boolean isFixRandomSeed() {
 		return fixRandomSeed;
@@ -828,6 +834,22 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 
 	public void setFixRandomSeed(boolean fixRandomSeed) {
 		this.fixRandomSeed = fixRandomSeed;
+	}
+
+	public DebtManagement getDebtManagement() {
+		return debtManagement;
+	}
+
+	public void setDebtManagement(DebtManagement debtManagement) {
+		this.debtManagement = debtManagement;
+	}
+
+	public DebtRepayment getDebtRepayment() {
+		return debtRepayment;
+	}
+
+	public void setDebtRepayment(DebtRepayment debtRepayment) {
+		this.debtRepayment = debtRepayment;
 	}
 
 }

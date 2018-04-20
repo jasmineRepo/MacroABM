@@ -2,6 +2,7 @@ package jasmine.model;
 
 import jasmine.algorithms.MapSorting;
 import jasmine.data.Parameters;
+import jasmine.enums.DebtRepayment;
 import microsim.data.db.PanelEntityKey;
 import microsim.event.Order;
 import microsim.event.SystemEventType;
@@ -225,7 +226,8 @@ public class Bank extends Agent implements IDoubleSource {
 			
 			// Each firm receives its credit demand
 			for(CFirm cFirm : creditMap.keySet()){
-				if(model.myopicDebtRepayment){
+//				if(model.myopicDebtRepayment){
+				if(model.debtRepayment.equals(DebtRepayment.Myopic)){					
 					cFirm.loan 					= cFirm.creditDemand;
 					cFirm.myopicExpendituresUpdate();
 				} else {
@@ -246,7 +248,8 @@ public class Bank extends Agent implements IDoubleSource {
 					log.error("Total credit remaining < 0");
 				}
 				
-				if(model.myopicDebtRepayment){
+//				if(model.myopicDebtRepayment){
+				if(model.debtRepayment.equals(DebtRepayment.Myopic)){
 					if(cFirm.creditDemand <= totalCreditRemaining){
 						cFirm.loan 				= cFirm.creditDemand;
 					} else {
@@ -283,7 +286,8 @@ public class Bank extends Agent implements IDoubleSource {
 	
 	void accounting(){
 		
-		if(!model.myopicDebtRepayment){
+//		if(!model.myopicDebtRepayment){
+		if(model.debtRepayment.equals(DebtRepayment.Psuedo_Rational)){
 			this.debt 							= 0;
 			this.badDebt 						= 0;
 			for(CFirm cFirm : model.getCFirms()){

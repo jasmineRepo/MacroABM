@@ -8,6 +8,8 @@ import java.util.Set;
 
 import jasmine.algorithms.*;
 import jasmine.data.Parameters;
+import jasmine.enums.DebtManagement;
+import jasmine.enums.DebtRepayment;
 import jasmine.object.*;
 import microsim.data.db.PanelEntityKey;
 import microsim.engine.SimulationEngine;
@@ -174,7 +176,8 @@ public class CFirm extends Firm {
 			In the pseudo rational adjustments case, firms do not have access to the credit line. There, firms have to take into account
 			their expected liquid asset at the end of the period. 
 			 */
-			if(model.myopicDebtRepayment){
+//			if(model.myopicDebtRepayment){
+			if(model.debtRepayment.equals(DebtRepayment.Myopic)){
 				aPrioriFeasibilityMyopic();
 			} else {
 				aPrioriFeasibilityPseudoRational();
@@ -189,7 +192,8 @@ public class CFirm extends Firm {
 			 
 		  	NOTE: this is because all expenditures funded through internal funds will reduce the firms' liquid assets, 	and therefore its end-of-the-period assets. Said differently, 
 		  	liquidAsset[1] records all the current expenditures funded internally (accounting convention, does not matter per se) */
-			if(!model.myopicDebtRepayment)
+//			if(!model.myopicDebtRepayment)
+			if(model.debtRepayment.equals(DebtRepayment.Psuedo_Rational))
 				pseudoRationalExpendituresUpdate();
 			break;
 			
@@ -1012,7 +1016,8 @@ public class CFirm extends Firm {
 			
 			// Difference between Mason and ours: because the firm has sufficient fund to repay its debt, it does so. 
 			// This reduces its stock of liquid asset, as well as the bank's debt
-			if(model.mason){
+//			if(model.mason){
+			if(model.debtManagement.equals(DebtManagement.Dosi_Et_Al)){
 				this.debt[1] 					= debt[0];
 				// BEFORE: 
 				// this.liquidAsset[1] -= c * q + supplier.getPPresent() * (invExp + invSub) / Parameters.getDimK();
@@ -1060,7 +1065,8 @@ public class CFirm extends Firm {
 					
 					// Difference between Mason and our version: firm considers intermediary level of investment in our
 					// version, whereas they directly set it to zero in the Mason one.
-					if(model.mason){
+//					if(model.mason){
+					if(model.debtManagement.equals(DebtManagement.Dosi_Et_Al)){
 						// The firm directly sets its substitutionary investments to 0
 						this.investmentSubstitutionary					= 0;	
 						
@@ -1116,7 +1122,8 @@ public class CFirm extends Firm {
 					
 					// Difference between Mason and our version: firm considers intermediary level of investment in our
 					// version, whereas they directly set it to zero in the Mason one.
-					if(model.mason){
+//					if(model.mason){
+					if(model.debtManagement.equals(DebtManagement.Dosi_Et_Al)){
 						// The firm directly sets its substitutionary investments to 0
 						this.investmentExpansionary					= 0;	
 						
@@ -1531,7 +1538,8 @@ public class CFirm extends Firm {
 			
 			double costInvestment				= investment * supplier.priceOfGoodProduced[1] / Parameters.getMachineSizeInCapital_cFirms();
 			
-			if(model.myopicDebtRepayment){
+//			if(model.myopicDebtRepayment){
+			if(model.debtRepayment.equals(DebtRepayment.Myopic)){
 				// The payment can be funded through internal funds and / or external funds
 				if(externalFunding > costInvestment){
 					this.externalFunding			-= costInvestment;
@@ -1572,7 +1580,8 @@ public class CFirm extends Firm {
 		this.stockFinalGood 					= productionQuantity + inventories[0];
 		double costProduction 					= productionQuantity * costToProduceGood;
 		
-		if(model.myopicDebtRepayment){
+//		if(model.myopicDebtRepayment){
+		if(model.debtRepayment.equals(DebtRepayment.Myopic)){
 			// The payment can be funded through internal funds and / or external funds
 			if(externalFunding > costProduction){
 				this.externalFunding				-= costProduction;
@@ -1659,7 +1668,8 @@ public class CFirm extends Firm {
 		
 		double debtRepaid 						= Parameters.getDebtRepaymentSharePerPeriod_cFirms() * debt[1];
 		
-		if(model.myopicDebtRepayment){
+//		if(model.myopicDebtRepayment){
+		if(model.debtRepayment.equals(DebtRepayment.Myopic)){
 			if(profit > 0){
 				collector.govRevenues 			+= profit * model.taxRate;
 				this.liquidAsset[1]				+= (1 - model.taxRate ) * profit + productionQuantity;
