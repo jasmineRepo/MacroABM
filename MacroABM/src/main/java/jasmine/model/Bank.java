@@ -95,8 +95,8 @@ public class Bank extends Agent implements IDoubleSource {
 		MonetaryBase,
 		CreditSupply,
 		LogCreditSupply,
-		BadDebt,
-		Debt;
+		LogBadDebt,
+		LogDebt;
 	}
 	
 	@Override
@@ -115,11 +115,17 @@ public class Bank extends Agent implements IDoubleSource {
 			else 
 				return 0.;
 			
-		case BadDebt:
-			return badDebt;
+		case LogBadDebt:
+//			return badDebt;
+			if(badDebt > 0)
+				return Math.log(badDebt);
+			else return Double.NaN;
 			
-		case Debt:
-			return debt;
+		case LogDebt:
+//			return debt;
+			if(debt > 0)
+				return Math.log(debt);
+			else return Double.NaN;
 			
 		default: 
 			throw new IllegalArgumentException("Unsupported variable"); 

@@ -442,12 +442,13 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		GovStockToGdp,
 		GovSpendingToGdp,
 		LogCreditDemand, 
-		MeanProductivityWeightedByMarketShare_kFirms,
-		MeanMachineProductivityWeightedByMarketShare,
+		LogMeanProductivityWeightedByMarketShare_kFirms,
+		LogMeanMachineProductivityWeightedByMarketShare,
 		// TODO: can remove afterwards, only to understand better the model
 		LogProduction_cFirms,
 		TotalMarkUp_cFirms,
-		Profit_cFirms,
+		LogProfit_cFirms,
+		LogProfit_kFirms,
 		Profit_kFirms,
 		MaxClientsPerFirm_kFirms,
 		TotalInventories,
@@ -470,11 +471,11 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		LogDesiredExpansionaryInvestmentTotal_cFirms,
 		LogDesiredExpansionaryInvestmentTotalStar_cFirms,
 		LaborDemand,
-		TopProdMachine,
-		TopProdLabor,
+		LogTopProdMachine,
+		LogTopProdLabor,
 		LaborRationingRatio,
-		BadDebt,
-		Wage,
+		LogBadDebt,
+		LogWage,
 //		Flag,
 		Empty;
 	}
@@ -500,8 +501,14 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return this.totalInventories;
 		case TotalMarkUp_cFirms:
 			return this.markUpTot_cFirms;
-		case Profit_cFirms:
-			return this.profit_cFirms;
+		case LogProfit_cFirms:
+			if(profit_cFirms > 0)
+				return Math.log(profit_cFirms);
+			else return Double.NaN;
+		case LogProfit_kFirms:
+			if(profit_kFirms > 0)
+				return Math.log(profit_kFirms);
+			else return Double.NaN;
 		case Profit_kFirms:
 			return this.profit_kFirms;
 			
@@ -563,14 +570,24 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	
 		case LaborDemand:
 			return this.laborDemand;
-		case TopProdLabor:			//XXX: Why is this called 'TopProdLabor', when it refers to the top machine productivity?
-			return this.topMachineProductivity;
-		case TopProdMachine:		//XXX: Why is this called 'TopProdMachine', when it refers to the productivity of the kFirms?  Wouldn't it be clearer to relabel the 'TopProdLabor' variable above with this name???
-			return this.topProductivity_kFirms;
-		case MeanProductivityWeightedByMarketShare_kFirms:
-			return this.meanProductivityWeightedByMarketShare_kFirms;
-		case MeanMachineProductivityWeightedByMarketShare:
-			return this.meanMachineProductivityWeightedByMarketShare;
+		case LogTopProdLabor:			//XXX: Why is this called 'TopProdLabor', when it refers to the top machine productivity?
+			if(topMachineProductivity > 0)
+				return Math.log(this.topMachineProductivity);
+			else return Double.NaN;
+		case LogTopProdMachine:		//XXX: Why is this called 'TopProdMachine', when it refers to the productivity of the kFirms?  Wouldn't it be clearer to relabel the 'TopProdLabor' variable above with this name???
+			if(topProductivity_kFirms > 0)
+				return Math.log(topProductivity_kFirms);
+			else return Double.NaN;
+		case LogMeanProductivityWeightedByMarketShare_kFirms:
+			if(meanProductivityWeightedByMarketShare_kFirms > 0)
+				return Math.log(meanProductivityWeightedByMarketShare_kFirms);
+			else return Double.NaN;
+		case LogMeanMachineProductivityWeightedByMarketShare:
+			if(meanMachineProductivityWeightedByMarketShare > 0)
+				return Math.log(meanMachineProductivityWeightedByMarketShare);
+			else return Double.NaN;
+
+			
 		// end
 		
 		case UnemploymentRate:
@@ -631,11 +648,14 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			else
 				return 0.;
 			
-		case Wage:
-			return wage[1];
+		case LogWage:
+			return Math.log(wage[1]);
 			
-		case BadDebt:
-			return totalBadDebt;
+		case LogBadDebt:
+//			return totalBadDebt;
+			if(totalBadDebt > 0)
+				return Math.log(totalBadDebt);
+			else return Double.NaN;
 			
 		case LaborRationingRatio:
 			return this.rationingRatio_Labor;
