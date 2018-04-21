@@ -115,12 +115,12 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 
 			    
 			    Set<JInternalFrame> outputComponentsPlots = new LinkedHashSet<JInternalFrame>();
-			    TimeSeriesSimulationPlotter consumptionToGDPplot = new TimeSeriesSimulationPlotter("Consumption to GDP ratio", ""); 
-				consumptionToGDPplot.addSeries("Consumption to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionToGDP)); 
+			    TimeSeriesSimulationPlotter consumptionToGDPplot = new TimeSeriesSimulationPlotter("Consumption to GDP ratio", "%"); 
+				consumptionToGDPplot.addSeries("Consumption to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionToGDPpercent)); 
 				updateChartSet.add(consumptionToGDPplot);			//Add to set to be updated in buildSchedule method
 				outputComponentsPlots.add(consumptionToGDPplot); 							    			    			    
-			    TimeSeriesSimulationPlotter investmentToGDPplot = new TimeSeriesSimulationPlotter("Investment to GDP ratio", "");
-				investmentToGDPplot.addSeries("Investment to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InvestmentToGDP)); 
+			    TimeSeriesSimulationPlotter investmentToGDPplot = new TimeSeriesSimulationPlotter("Investment to GDP ratio", "%");
+				investmentToGDPplot.addSeries("Investment to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InvestmentToGDPpercent)); 
 				updateChartSet.add(investmentToGDPplot);			//Add to set to be updated in buildSchedule method
 				outputComponentsPlots.add(investmentToGDPplot);
 				tabSet.add(createScrollPaneFromPlots(outputComponentsPlots, "Output Components", outputComponentsPlots.size()));
@@ -156,9 +156,9 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			    //Two charts under one tab, because data in charts have different scales
 //			    Set<JInternalFrame> debtPlots = new LinkedHashSet<JInternalFrame>();
 				TimeSeriesSimulationPlotter debt = new TimeSeriesSimulationPlotter("Debt", "Log");
-				debt.addSeries("cFirm sector Bad debt (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogBadDebt));
-				debt.addSeries("Bank Bad debt (log)", (IDoubleSource) new MultiTraceFunction.Double(bank, Bank.Variables.LogBadDebt)); 
 				debt.addSeries("Debt (log)", (IDoubleSource) new MultiTraceFunction.Double(bank, Bank.Variables.LogDebt));
+				debt.addSeries("cFirm sector Bad debt (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogBadDebt));
+//				debt.addSeries("Bank Bad debt (log)", (IDoubleSource) new MultiTraceFunction.Double(bank, Bank.Variables.LogBadDebt)); 
 				debt.setName("Debt");
 				updateChartSet.add(debt);			//Add to set to be updated in buildSchedule method
 //				debtPlots.add(debt);
@@ -224,15 +224,15 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				
 				//As a proportion of GDP
 				Set<JInternalFrame> investmentToGDPPlots = new LinkedHashSet<JInternalFrame>();
-				TimeSeriesSimulationPlotter expansionaryInvestmentToGDPplot = new TimeSeriesSimulationPlotter("Expansionary Investment to GDP", "");
-				expansionaryInvestmentToGDPplot.addSeries("Actual inv to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ActualExpansionaryInvestmentToGDP_cFirms));
-				expansionaryInvestmentToGDPplot.addSeries("Desired to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.DesiredExpansionaryInvestmentToGDP_cFirms));
-				expansionaryInvestmentToGDPplot.addSeries("Desired star to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.DesiredExpansionaryInvestmentStarToGDP_cFirms));	//XXX: What does star mean???
+				TimeSeriesSimulationPlotter expansionaryInvestmentToGDPplot = new TimeSeriesSimulationPlotter("Expansionary Investment to GDP", "%");
+				expansionaryInvestmentToGDPplot.addSeries("Actual inv to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ActualExpansionaryInvestmentToGDPpercent_cFirms));
+				expansionaryInvestmentToGDPplot.addSeries("Desired to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.DesiredExpansionaryInvestmentToGDPpercent_cFirms));
+				expansionaryInvestmentToGDPplot.addSeries("Desired star to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.DesiredExpansionaryInvestmentStarToGDPpercent_cFirms));	//XXX: What does star mean???
 //				expansionaryInvestmentPlot.setName("Investment");
 				updateChartSet.add(expansionaryInvestmentToGDPplot);			//Add to set to be updated in buildSchedule method
 			    investmentToGDPPlots.add(expansionaryInvestmentToGDPplot);
-			    TimeSeriesSimulationPlotter substitionaryInvestmentToGDPplot = new TimeSeriesSimulationPlotter("Substitionary Investment to GDP", "");
-				substitionaryInvestmentToGDPplot.addSeries("Substitionary investment to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ActualSubsitionaryInvestmentToGDP_cFirms));
+			    TimeSeriesSimulationPlotter substitionaryInvestmentToGDPplot = new TimeSeriesSimulationPlotter("Substitionary Investment to GDP", "%");
+				substitionaryInvestmentToGDPplot.addSeries("Substitionary investment to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ActualSubsitionaryInvestmentToGDPpercent_cFirms));
 				updateChartSet.add(substitionaryInvestmentToGDPplot);			//Add to set to be updated in buildSchedule method
 				investmentToGDPPlots.add(substitionaryInvestmentToGDPplot);
 				tabSet.add(createScrollPaneFromPlots(investmentToGDPPlots, "Investment to GDP", investmentToGDPPlots.size()));
@@ -259,7 +259,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 //				rdAll.addSeries("Top Machine Productivity", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.TopProdMachine));	//was labelled 'Top Prod Capital'.
 				updateChartSet.add(machineProd);			//Add to set to be updated in buildSchedule method
 				productivityPlots.add(machineProd); 							    			    			    
-			    TimeSeriesSimulationPlotter capitalProd = new TimeSeriesSimulationPlotter("Capital Firm Productivity", "");
+			    TimeSeriesSimulationPlotter capitalProd = new TimeSeriesSimulationPlotter("Capital Firm Productivity", "Log");
 				capitalProd.addSeries("Avg Firm Productivity (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogMeanProductivityWeightedByMarketShare_kFirms));	//was labelled 'Mean K'.
 				capitalProd.addSeries("Top Machine Productivity (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTopProdMachine));	//was labelled 'Top Prod Capital'. 
 				updateChartSet.add(capitalProd);			//Add to set to be updated in buildSchedule method
@@ -282,13 +282,13 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 
 			    
 				Set<JInternalFrame> profitToGDPplots = new LinkedHashSet<JInternalFrame>();
-				TimeSeriesSimulationPlotter profitToGDP = new TimeSeriesSimulationPlotter("Total Profit to GDP: Consumption & Capital Firms", ""); 
-				profitToGDP.addSeries("Consumption Firms sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProfitToGDP_cFirms));
-				profitToGDP.addSeries("Capital Firms sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProfitToGDP_kFirms));
+				TimeSeriesSimulationPlotter profitToGDP = new TimeSeriesSimulationPlotter("Total Profit to GDP: Consumption & Capital Firms", "%"); 
+				profitToGDP.addSeries("Consumption Firms sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProfitToGDPpercent_cFirms));
+				profitToGDP.addSeries("Capital Firms sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProfitToGDPpercent_kFirms));
 				updateChartSet.add(profitToGDP);			//Add to set to be updated in buildSchedule method
 				profitToGDPplots.add(profitToGDP);				
-				TimeSeriesSimulationPlotter capitalProfitToGDP = new TimeSeriesSimulationPlotter("Capital Firm Profit to GDP", ""); 
-				capitalProfitToGDP.addSeries("Capital Firms sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProfitToGDP_kFirms));
+				TimeSeriesSimulationPlotter capitalProfitToGDP = new TimeSeriesSimulationPlotter("Capital Firm Profit to GDP", "%"); 
+				capitalProfitToGDP.addSeries("Capital Firms sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProfitToGDPpercent_kFirms));
 				updateChartSet.add(capitalProfitToGDP);			//Add to set to be updated in buildSchedule method								
 				profitToGDPplots.add(capitalProfitToGDP);
 			    tabSet.add(createScrollPaneFromPlots(profitToGDPplots, "Profit to GDP", profitToGDPplots.size()));
@@ -310,17 +310,17 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 //			    tabSet.add(inventories);					//Tab will be created for this chart
 ////				GuiUtils.addWindow(inventories, 300, 500, 300, 250);
 
-				TimeSeriesSimulationPlotter inventoriesToGDP = new TimeSeriesSimulationPlotter("Inventories To GDP", ""); 
-				inventoriesToGDP.addSeries("Total Consumption Sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.TotalInventoriesToGDP));
+				TimeSeriesSimulationPlotter inventoriesToGDP = new TimeSeriesSimulationPlotter("Inventories To GDP", "%"); 
+				inventoriesToGDP.addSeries("Total Consumption Sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.TotalInventoriesToGDPpercent));
 				inventoriesToGDP.setName("Inventories To GDP");
 				updateChartSet.add(inventoriesToGDP);			//Add to set to be updated in buildSchedule method
 			    tabSet.add(inventoriesToGDP);					//Tab will be created for this chart
 
 			    
-				TimeSeriesSimulationPlotter government = new TimeSeriesSimulationPlotter("Government Ratios", "");
-				government.addSeries("Balance (revenues - spending) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovBalanceToGdp));
-				government.addSeries("Stock (accumulated Balance over time) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovStockToGdp));
-				government.addSeries("Spending to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovSpendingToGdp));
+				TimeSeriesSimulationPlotter government = new TimeSeriesSimulationPlotter("Government Ratios", "%");
+				government.addSeries("Balance (revenues - spending) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovBalanceToGDPpercent));
+				government.addSeries("Stock (accumulated Balance over time) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovStockToGDPpercent));
+				government.addSeries("Spending to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovSpendingToGDPpercent));
 				government.setName("Government");
 				updateChartSet.add(government);			//Add to set to be updated in buildSchedule method
 			    tabSet.add(government);					//Tab will be created for this chart
@@ -332,8 +332,8 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				laborMarketWage.addSeries("Market Wage (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogWage));
 				updateChartSet.add(laborMarketWage);			//Add to set to be updated in buildSchedule method
 				laborMarketPlots.add(laborMarketWage);
-			    TimeSeriesSimulationPlotter laborMarketUnemployment = new TimeSeriesSimulationPlotter("Unemployment Rate", "");
-				laborMarketUnemployment.addSeries("Unemployment Rate", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.UnemploymentRate));
+			    TimeSeriesSimulationPlotter laborMarketUnemployment = new TimeSeriesSimulationPlotter("Unemployment Rate", "%");
+				laborMarketUnemployment.addSeries("Unemployment Rate", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.UnemploymentRatePercent));
 				updateChartSet.add(laborMarketUnemployment);			//Add to set to be updated in buildSchedule method
 				laborMarketPlots.add(laborMarketUnemployment);
 				tabSet.add(createScrollPaneFromPlots(laborMarketPlots, "Labor Market", laborMarketPlots.size()));
@@ -352,7 +352,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 
 				
 				Set<JInternalFrame> exitPlots = new LinkedHashSet<JInternalFrame>();
-				TimeSeriesSimulationPlotter cFirmsExitPlot = new TimeSeriesSimulationPlotter("Consumption Good Firms Exit Rate", "% per time-step");
+				TimeSeriesSimulationPlotter cFirmsExitPlot = new TimeSeriesSimulationPlotter("Consumption Good Firms Exit Rate", "%");
 				cFirmsExitPlot.addSeries("Total", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ExitPercent_cFirms));
 				cFirmsExitPlot.addSeries("Liquidity Issue", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ExitPercentLiquidityIssue_cFirms));
 				cFirmsExitPlot.addSeries("Market Share Issue", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ExitPercentMarketShareIssue_cFirms));
@@ -362,7 +362,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				exitPlots.add(cFirmsExitPlot);
 //			    tabSet.add(cFirmsExitPlot);					//Tab will be created for this chart
 //				GuiUtils.addWindow(exit, 900, 500, 300, 250);
-				TimeSeriesSimulationPlotter kFirmsExitPlot = new TimeSeriesSimulationPlotter("Capital Good Firms Exit Rate", "% per time-step");
+				TimeSeriesSimulationPlotter kFirmsExitPlot = new TimeSeriesSimulationPlotter("Capital Good Firms Exit Rate", "%");
 				kFirmsExitPlot.addSeries("Total", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ExitPercent_kFirms));
 				updateChartSet.add(kFirmsExitPlot);			//Add to set to be updated in buildSchedule method
 				exitPlots.add(kFirmsExitPlot);
@@ -465,8 +465,8 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 //				GuiUtils.addWindow(inflations, 500, 400, 400, 200);
 				
 				TimeSeriesSimulationPlotter government = new TimeSeriesSimulationPlotter("Government", "% of GDP");
-				government.addSeries("Balance", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovBalanceToGdp));
-				government.addSeries("Debt", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovStockToGdp));
+				government.addSeries("Balance", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovBalanceToGDPpercent));
+				government.addSeries("Debt", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovStockToGDPpercent));
 				government.setName("Government");
 				updateChartSetDosiCompare.add(government);			//Add to set to be updated in buildSchedule method
 			    tabSetDosiCompare.add(government);					//Tab will be created for this chart

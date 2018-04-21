@@ -420,12 +420,12 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	
 	// These methods mainly allow to transform the aggregate variables computed here in time series, and then to plot them in the observer
 	public enum Variables {
-		UnemploymentRate,
+		UnemploymentRatePercent,
 		LogGDP,
 		LogTotalInvestment,
 //		ConsumptionLog,
-		ConsumptionToGDP,
-		InvestmentToGDP,
+		ConsumptionToGDPpercent,
+		InvestmentToGDPpercent,
 		GdpGrowth,
 		TotalExpansionaryInvestment_cFirms,
 		TotalSubstitutionaryInvestment_cFirms,
@@ -442,23 +442,23 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		ExitLiquidityIssue_cFirms,
 		ExitMarketShareIssue_cFirms,
 		ExitAssetMarket_cFirms,
-		GovBalanceToGdp,
-		GovStockToGdp,
-		GovSpendingToGdp,
+		GovBalanceToGDPpercent,
+		GovStockToGDPpercent,
+		GovSpendingToGDPpercent,
 		LogCreditDemand, 
 		LogMeanProductivityWeightedByMarketShare_kFirms,
 		LogMeanMachineProductivityWeightedByMarketShare,
 		// TODO: can remove afterwards, only to understand better the model
 		LogProduction_cFirms,
 		TotalMarkUp_cFirms,
-		ProfitToGDP_cFirms,
+		ProfitToGDPpercent_cFirms,
 		LogProfit_cFirms,
 		LogProfit_kFirms,
 		Profit_kFirms,
-		ProfitToGDP_kFirms,
+		ProfitToGDPpercent_kFirms,
 		MaxClientsPerFirm_kFirms,
 		TotalInventories,
-		TotalInventoriesToGDP,
+		TotalInventoriesToGDPpercent,
 		AverageAgeMachine_cFirms,
 		LogRandDexpenditures_kFirms,
 		LogConsumption,
@@ -478,10 +478,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		LogDesiredExpansionaryInvestmentTotal_cFirms,
 		LogDesiredExpansionaryInvestmentTotalStar_cFirms,
 
-		ActualExpansionaryInvestmentToGDP_cFirms,
-		DesiredExpansionaryInvestmentToGDP_cFirms,
-		DesiredExpansionaryInvestmentStarToGDP_cFirms,
-		ActualSubsitionaryInvestmentToGDP_cFirms,
+		ActualExpansionaryInvestmentToGDPpercent_cFirms,
+		DesiredExpansionaryInvestmentToGDPpercent_cFirms,
+		DesiredExpansionaryInvestmentStarToGDPpercent_cFirms,
+		ActualSubsitionaryInvestmentToGDPpercent_cFirms,
 
 		LaborDemand,
 		LogTopProdMachine,
@@ -518,8 +518,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return this.avgAgeMachines_cFirms;
 		case TotalInventories:
 			return this.totalInventories;
-		case TotalInventoriesToGDP:
-			return this.totalInventories / gdp[1];
+		case TotalInventoriesToGDPpercent:
+			return 100. * totalInventories / gdp[1];
 		case TotalMarkUp_cFirms:
 			return this.markUpTot_cFirms;
 		case LogProfit_cFirms:
@@ -533,14 +533,14 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		case Profit_kFirms:
 			return this.profit_kFirms;
 
-		case ProfitToGDP_kFirms:
+		case ProfitToGDPpercent_kFirms:
 			if(gdp[1] > 0)
-				return profit_kFirms / gdp[1];
+				return 100. * profit_kFirms / gdp[1];
 			else return Double.NaN;
 			
-		case ProfitToGDP_cFirms:
+		case ProfitToGDPpercent_cFirms:
 			if(gdp[1] > 0)
-				return profit_cFirms / gdp[1];
+				return 100. * profit_cFirms / gdp[1];
 			else return Double.NaN;
 			
 		case LogConsumption:
@@ -600,24 +600,24 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 				return Double.NaN;
 			
 			
-		case ActualExpansionaryInvestmentToGDP_cFirms:
+		case ActualExpansionaryInvestmentToGDPpercent_cFirms:
 			if(gdp[1] > 0)
-				return investmentExpansionaryTotal_cFirms / gdp[1];
+				return 100. * investmentExpansionaryTotal_cFirms / gdp[1];
 			else return Double.NaN;
 			
-		case DesiredExpansionaryInvestmentToGDP_cFirms:
+		case DesiredExpansionaryInvestmentToGDPpercent_cFirms:
 			if(gdp[1] > 0)
-				return desiredExpansionaryInvestmentTotal_cFirms / gdp[1];
+				return 100. * desiredExpansionaryInvestmentTotal_cFirms / gdp[1];
 			else return Double.NaN;
 			
-		case DesiredExpansionaryInvestmentStarToGDP_cFirms:
+		case DesiredExpansionaryInvestmentStarToGDPpercent_cFirms:
 			if(gdp[1] > 0)
-				return desiredExpansionaryInvestmentTotalStar_cFirms / gdp[1];
+				return 100. * desiredExpansionaryInvestmentTotalStar_cFirms / gdp[1];
 			else return Double.NaN;
 			
-		case ActualSubsitionaryInvestmentToGDP_cFirms:
+		case ActualSubsitionaryInvestmentToGDPpercent_cFirms:
 			if(gdp[1] > 0)
-				return investmentSubstitutionaryTotal_cFirms / gdp[1];
+				return 100. * investmentSubstitutionaryTotal_cFirms / gdp[1];
 			else return Double.NaN;
 			
 	
@@ -643,17 +643,17 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			
 		// end
 		
-		case UnemploymentRate:
-			return unemploymentRate[1];
+		case UnemploymentRatePercent:
+			return 100. * unemploymentRate[1];
 			
 		case LogGDP:
 			return gdpLog;
 			
-		case ConsumptionToGDP:
-			return consumption[1] / gdp[1];
+		case ConsumptionToGDPpercent:
+			return 100. * consumption[1] / gdp[1];
 			
-		case InvestmentToGDP:
-			return (investmentExpansionaryTotal_cFirms + investmentSubstitutionaryTotal_cFirms) / gdp[1];
+		case InvestmentToGDPpercent:
+			return 100. * (investmentExpansionaryTotal_cFirms + investmentSubstitutionaryTotal_cFirms) / gdp[1];
 			
 		case LogTotalInvestment:
 			if(investmentExpansionaryTotal_cFirms + investmentSubstitutionaryTotal_cFirms > 0) {
@@ -695,12 +695,12 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		case ProducerInflation_kFirms:
 			return (ppi[1] - ppi[0]) / ppi[0];
 			
-		case GovBalanceToGdp:
-			return govBalanceToGdp;
-		case GovStockToGdp:
-			return govStockToGdp;
-		case GovSpendingToGdp:
-			return govSpendingToGdp;
+		case GovBalanceToGDPpercent:
+			return 100. * govBalanceToGdp;
+		case GovStockToGDPpercent:
+			return 100. * govStockToGdp;
+		case GovSpendingToGDPpercent:
+			return 100. * govSpendingToGdp;
 			
 		case LogCreditDemand:
 			if(aggregateCreditDemand > 1)
@@ -1021,7 +1021,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	
 	void aggregateComputation(){
 		
-		this.creditRationingRate_cFirms 		/= model.getNumberOfCFirms();
+		this.creditRationingRate_cFirms 		/= (model.getNumberOfCFirms() / 100.);		// Divide by 100 to create percentage.
 		
 		// CONSUMPTION-GOOD FIRMS
 		// Investments

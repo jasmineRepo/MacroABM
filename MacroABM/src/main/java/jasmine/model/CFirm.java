@@ -1055,7 +1055,7 @@ public class CFirm extends Firm {
 			} 
 			else {
 				
-				collector.creditRationingRate_cFirms += 1;
+				collector.creditRationingRate_cFirms += 1.;
 				
 				if(debt[0] + supplier.priceOfGoodProduced[1] * desiredInvestmentExpansionaryStar / Parameters.getMachineSizeInCapital_cFirms() + costToProduceGood * desiredProductionStar <= liquidAsset[1] + loan){
 					
