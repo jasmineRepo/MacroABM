@@ -70,12 +70,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 	/////////////////// Ross additions ////////////////////////////////////////////////
 	
 	private Set<JInternalFrame> updateChartSet;			//Collection of graphical objects to be updated on schedule
-	private Set<JComponent> tabSet;						//Collection of graphical objects to be displayed in a tabbed Frame
-	
-	//For Dosi comparison
-	private Set<JInternalFrame> updateChartSetDosiCompare;		//Collection of graphical objects to be updated on schedule
-	private Set<JComponent> tabSetDosiCompare;					//Collection of graphical objects to be displayed in a tabbed Frame
-
+	private Set<JComponent> tabSet;						//Collection of graphical objects to be displayed in a tabbed Frame	
 	
 
 	public MacroObserver(SimulationManager manager, SimulationCollectorManager collectorManager) {
@@ -95,46 +90,35 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 		
 		if(charts){
 						
-			if(!dosiComparison){
+			updateChartSet = new LinkedHashSet<JInternalFrame>();	//Set of all charts needed to be scheduled for updating
+			tabSet = new LinkedHashSet<JComponent>();		//Set of all JInternalFrames each having a tab.  Each tab frame will potentially contain more than one chart each.
+
+		    //Create chart containing time-series' of log GDP, log consumption and log total investment
+			TimeSeriesSimulationPlotter logOutputConsumptionInvestment = new TimeSeriesSimulationPlotter("Aggregate Time Series", "Log");
+			logOutputConsumptionInvestment.addSeries("Log GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogGDP));
+			logOutputConsumptionInvestment.addSeries("Log Consumption", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogConsumption));
+			logOutputConsumptionInvestment.addSeries("Log Investment", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalInvestment));
+			logOutputConsumptionInvestment.setName("Output, Consumption and Investment");
+			updateChartSet.add(logOutputConsumptionInvestment);			//Add to set to be updated in buildSchedule method
+		    tabSet.add(logOutputConsumptionInvestment);
+//			GuiUtils.addWindow(logOutputConsumptionInvestment, 0, 0, 300, 250);
+
+		    
+		    Set<JInternalFrame> outputComponentsPlots = new LinkedHashSet<JInternalFrame>();
+		    TimeSeriesSimulationPlotter consumptionToGDPplot = new TimeSeriesSimulationPlotter("Consumption to GDP ratio", "%"); 
+			consumptionToGDPplot.addSeries("Consumption to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionToGDPpercent)); 
+			updateChartSet.add(consumptionToGDPplot);			//Add to set to be updated in buildSchedule method
+			outputComponentsPlots.add(consumptionToGDPplot); 							    			    			    
+		    TimeSeriesSimulationPlotter investmentToGDPplot = new TimeSeriesSimulationPlotter("Investment to GDP ratio", "%");
+			investmentToGDPplot.addSeries("Investment to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InvestmentToGDPpercent)); 
+			updateChartSet.add(investmentToGDPplot);			//Add to set to be updated in buildSchedule method
+			outputComponentsPlots.add(investmentToGDPplot);
+			tabSet.add(createScrollPaneFromPlots(outputComponentsPlots, "Output Components", outputComponentsPlots.size()));
+		    
+		    
+		    
+		    if(!dosiComparison){
 				
-				updateChartSet = new LinkedHashSet<JInternalFrame>();	//Set of all charts needed to be scheduled for updating
-				tabSet = new LinkedHashSet<JComponent>();		//Set of all JInternalFrames each having a tab.  Each tab frame will potentially contain more than one chart each.
-
-
-			    //Create chart containing time-series' of log GDP, log consumption and log total investment
-				TimeSeriesSimulationPlotter logOutputConsumptionInvestment = new TimeSeriesSimulationPlotter("Aggregate Time Series", "Log");
-				logOutputConsumptionInvestment.addSeries("Log GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogGDP));
-//				logOutputConsumptionInvestment.addSeries("Log Consumption", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionLog));
-				logOutputConsumptionInvestment.addSeries("Log Consumption", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogConsumption));
-				logOutputConsumptionInvestment.addSeries("Log Investment", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalInvestment));
-				logOutputConsumptionInvestment.setName("Output, Consumption and Investment");
-				updateChartSet.add(logOutputConsumptionInvestment);			//Add to set to be updated in buildSchedule method
-			    tabSet.add(logOutputConsumptionInvestment);
-//				GuiUtils.addWindow(logOutputConsumptionInvestment, 0, 0, 300, 250);
-
-
-			    
-			    Set<JInternalFrame> outputComponentsPlots = new LinkedHashSet<JInternalFrame>();
-			    TimeSeriesSimulationPlotter consumptionToGDPplot = new TimeSeriesSimulationPlotter("Consumption to GDP ratio", "%"); 
-				consumptionToGDPplot.addSeries("Consumption to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionToGDPpercent)); 
-				updateChartSet.add(consumptionToGDPplot);			//Add to set to be updated in buildSchedule method
-				outputComponentsPlots.add(consumptionToGDPplot); 							    			    			    
-			    TimeSeriesSimulationPlotter investmentToGDPplot = new TimeSeriesSimulationPlotter("Investment to GDP ratio", "%");
-				investmentToGDPplot.addSeries("Investment to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InvestmentToGDPpercent)); 
-				updateChartSet.add(investmentToGDPplot);			//Add to set to be updated in buildSchedule method
-				outputComponentsPlots.add(investmentToGDPplot);
-				tabSet.add(createScrollPaneFromPlots(outputComponentsPlots, "Output Components", outputComponentsPlots.size()));
-
-//			    
-//			    //Create chart containing time-series' of log GDP, log consumption and log total investment
-//				TimeSeriesSimulationPlotter consumptionInvestmentToGDP = new TimeSeriesSimulationPlotter("Components of GDP", "");
-////				logOutputConsumptionInvestment.addSeries("Log Consumption", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionLog));
-//				consumptionInvestmentToGDP.addSeries("Consumption To GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionToGDP));
-//				consumptionInvestmentToGDP.addSeries("Investment To GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InvestmentToGDP));
-//				consumptionInvestmentToGDP.setName("Components of GDP");
-//				updateChartSet.add(consumptionInvestmentToGDP);			//Add to set to be updated in buildSchedule method
-//			    tabSet.add(consumptionInvestmentToGDP);
-
 			    
 			    //Create chart containing time-series' of credit supply and demand
 				TimeSeriesSimulationPlotter bankMarket = new TimeSeriesSimulationPlotter("Credit Activity", "Log");
@@ -163,6 +147,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				updateChartSet.add(debt);			//Add to set to be updated in buildSchedule method
 //				debtPlots.add(debt);
 			    tabSet.add(debt);
+			    
 ////				GuiUtils.addWindow(debt, 600, 0, 300, 250);							    			    			    
 //			    TimeSeriesSimulationPlotter badDebt = new TimeSeriesSimulationPlotter("Bad Debt", "");
 //				badDebt.addSeries("Bad Debt (cFirm sector)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogBadDebt));
@@ -206,21 +191,25 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 //			    tabSet.add(capitalMarket);					//Tab will be created for this chart
 ////				GuiUtils.addWindow(capitalMarket, 0, 250, 300, 250);
 
+		    }
 			    
-			    Set<JInternalFrame> investmentPlots = new LinkedHashSet<JInternalFrame>();
-				TimeSeriesSimulationPlotter expansionaryInvestmentPlot = new TimeSeriesSimulationPlotter("Expansionary Investment", "Log");			//Was Capital Market
-				expansionaryInvestmentPlot.addSeries("Actual (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalExpansionaryInvestment_cFirms));
-				expansionaryInvestmentPlot.addSeries("Desired (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDesiredExpansionaryInvestmentTotal_cFirms));
-				expansionaryInvestmentPlot.addSeries("Desired star (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDesiredExpansionaryInvestmentTotalStar_cFirms));	//XXX: What does star mean???
+		    Set<JInternalFrame> investmentPlots = new LinkedHashSet<JInternalFrame>();
+			TimeSeriesSimulationPlotter expansionaryInvestmentPlot = new TimeSeriesSimulationPlotter("Expansionary Investment", "Log");			//Was Capital Market
+			expansionaryInvestmentPlot.addSeries("Actual (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalExpansionaryInvestment_cFirms));
+			expansionaryInvestmentPlot.addSeries("Desired (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDesiredExpansionaryInvestmentTotal_cFirms));
+			expansionaryInvestmentPlot.addSeries("Desired star (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDesiredExpansionaryInvestmentTotalStar_cFirms));	//XXX: What does star mean???
 //				expansionaryInvestmentPlot.setName("Investment");
-				updateChartSet.add(expansionaryInvestmentPlot);			//Add to set to be updated in buildSchedule method
-			    investmentPlots.add(expansionaryInvestmentPlot);
-			    TimeSeriesSimulationPlotter substitionaryInvestmentPlot = new TimeSeriesSimulationPlotter("Substitionary Investment", "Log");	
-				substitionaryInvestmentPlot.addSeries("Substitionary investment (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalSubsitionaryInvestment_cFirms));
-				updateChartSet.add(substitionaryInvestmentPlot);			//Add to set to be updated in buildSchedule method
-				investmentPlots.add(substitionaryInvestmentPlot);
-				tabSet.add(createScrollPaneFromPlots(investmentPlots, "Investment", investmentPlots.size()));
+			updateChartSet.add(expansionaryInvestmentPlot);			//Add to set to be updated in buildSchedule method
+		    investmentPlots.add(expansionaryInvestmentPlot);
+		    TimeSeriesSimulationPlotter substitionaryInvestmentPlot = new TimeSeriesSimulationPlotter("Substitionary Investment", "Log");	
+			substitionaryInvestmentPlot.addSeries("Substitionary investment (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalSubsitionaryInvestment_cFirms));
+			updateChartSet.add(substitionaryInvestmentPlot);			//Add to set to be updated in buildSchedule method
+			investmentPlots.add(substitionaryInvestmentPlot);
+			tabSet.add(createScrollPaneFromPlots(investmentPlots, "Investment", investmentPlots.size()));
 
+
+			if(!dosiComparison) {
+				
 				
 				//As a proportion of GDP
 				Set<JInternalFrame> investmentToGDPPlots = new LinkedHashSet<JInternalFrame>();
@@ -316,16 +305,18 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				updateChartSet.add(inventoriesToGDP);			//Add to set to be updated in buildSchedule method
 			    tabSet.add(inventoriesToGDP);					//Tab will be created for this chart
 
-			    
-				TimeSeriesSimulationPlotter government = new TimeSeriesSimulationPlotter("Government Ratios", "%");
-				government.addSeries("Balance (revenues - spending) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovBalanceToGDPpercent));
-				government.addSeries("Stock (accumulated Balance over time) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovStockToGDPpercent));
-				government.addSeries("Spending to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovSpendingToGDPpercent));
-				government.setName("Government");
-				updateChartSet.add(government);			//Add to set to be updated in buildSchedule method
-			    tabSet.add(government);					//Tab will be created for this chart
+			}
+			
+			TimeSeriesSimulationPlotter government = new TimeSeriesSimulationPlotter("Government Ratios", "%");
+			government.addSeries("Balance (revenues - spending) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovBalanceToGDPpercent));
+			government.addSeries("Stock (accumulated Balance over time) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovStockToGDPpercent));
+			government.addSeries("Spending to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovSpendingToGDPpercent));
+			government.setName("Government");
+			updateChartSet.add(government);			//Add to set to be updated in buildSchedule method
+		    tabSet.add(government);					//Tab will be created for this chart
 //				GuiUtils.addWindow(government, 600, 500, 300, 250);
-			    
+			
+		    if(!dosiComparison) {
 
 			    Set<JInternalFrame> laborMarketPlots = new LinkedHashSet<JInternalFrame>();			    
 			    TimeSeriesSimulationPlotter laborMarketWage = new TimeSeriesSimulationPlotter("Market Wage", "Log");
@@ -385,115 +376,107 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 ////				GuiUtils.addWindow(flag, 300, 300, 300, 250); 
 			    
 			    
-			    //-------------------------------------------------------------------------------------------------------
-			    //
-		    	//	BUILD A TABBED PANE HOLDING ALL THE CHARTS THAT ONLY UPDATE AT EACH TIME-STEP
-			    //
-		    	//-------------------------------------------------------------------------------------------------------
-			    
-		        //Create tabbed pane to hold all the charts and add to the JAS-mine GUI window
-		    	JInternalFrame chartsFrame = new JInternalFrame("Charts");
-				JTabbedPane tabbedPane = new JTabbedPane();
-				chartsFrame.add(tabbedPane);
-				
-				for(JComponent plot: tabSet) {
-					tabbedPane.addTab(plot.getName(), plot);
-				}
-				tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		    	chartsFrame.setResizable(true);
-		    	chartsFrame.setMaximizable(true);
-				GuiUtils.addWindow(chartsFrame, 300, 0, 1560, 660);
-			    
+//			    //-------------------------------------------------------------------------------------------------------
+//			    //
+//		    	//	BUILD A TABBED PANE HOLDING ALL THE CHARTS THAT ONLY UPDATE AT EACH TIME-STEP
+//			    //
+//		    	//-------------------------------------------------------------------------------------------------------
+//			    
+//		        //Create tabbed pane to hold all the charts and add to the JAS-mine GUI window
+//		    	JInternalFrame chartsFrame = new JInternalFrame("Charts");
+//				JTabbedPane tabbedPane = new JTabbedPane();
+//				chartsFrame.add(tabbedPane);
+//				
+//				for(JComponent plot: tabSet) {
+//					tabbedPane.addTab(plot.getName(), plot);
+//				}
+//				tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+//		    	chartsFrame.setResizable(true);
+//		    	chartsFrame.setMaximizable(true);
+//				GuiUtils.addWindow(chartsFrame, 300, 0, 1560, 660);
+//			    
 				
 			} else {
 				
-				updateChartSetDosiCompare = new LinkedHashSet<JInternalFrame>();	//Set of all charts needed to be scheduled for updating (NOT the convergence plot!)
-				tabSetDosiCompare = new LinkedHashSet<JComponent>();		//Set of all JInternalFrames each having a tab.  Each tab frame will potentially contain more than one chart each.
-				
-								
-				TimeSeriesSimulationPlotter logOutputConsumptionInvestment = new TimeSeriesSimulationPlotter("Time Series", "Log");
-				logOutputConsumptionInvestment.addSeries("Log GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogGDP));
-				logOutputConsumptionInvestment.addSeries("Log Consumption", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogConsumption));
-				logOutputConsumptionInvestment.addSeries("Log Investment", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalInvestment));
-				logOutputConsumptionInvestment.setName("Time-series");
-				updateChartSetDosiCompare.add(logOutputConsumptionInvestment);			//Add to set to be updated in buildSchedule method
-			    tabSetDosiCompare.add(logOutputConsumptionInvestment);					//Tab will be created for this chart
-//				GuiUtils.addWindow(logOutputConsumptionInvestment, 0, 0, 500, 400);
-								
-				TimeSeriesSimulationPlotter logInvestments = new TimeSeriesSimulationPlotter("Log Investments", "");
-				logInvestments.addSeries("Log Inv. Sub.", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalSubsitionaryInvestment_cFirms));
-				logInvestments.addSeries("Log Inv. Exp.", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalExpansionaryInvestment_cFirms));
-				logInvestments.setName("Investment");
-				updateChartSetDosiCompare.add(logInvestments);			//Add to set to be updated in buildSchedule method
-			    tabSetDosiCompare.add(logInvestments);					//Tab will be created for this chart
-//				GuiUtils.addWindow(logInvestments, 0, 400, 500, 200);
-				
-				TimeSeriesSimulationPlotter logProductivityMomentsC = new TimeSeriesSimulationPlotter("Moments prod. C-firms", "Log");
-				logProductivityMomentsC.addSeries("Mean", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.meanLogProductivity_cFirms));
-				logProductivityMomentsC.setName("Moments prod. C-firms");
-				updateChartSetDosiCompare.add(logProductivityMomentsC);			//Add to set to be updated in buildSchedule method
-			    tabSetDosiCompare.add(logProductivityMomentsC);					//Tab will be created for this chart
-//				GuiUtils.addWindow(logProductivityMomentsC, 500, 0, 400, 200);
-				
-				TimeSeriesSimulationPlotter logProductivityMomentsK = new TimeSeriesSimulationPlotter("Moments prod. K-firms", "Log");
-				logProductivityMomentsK.addSeries("Mean", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.meanLogProductivity_kFirms));
-				logProductivityMomentsK.setName("Moments prod. K-firms");
-				updateChartSetDosiCompare.add(logProductivityMomentsK);			//Add to set to be updated in buildSchedule method
-			    tabSetDosiCompare.add(logProductivityMomentsK);					//Tab will be created for this chart
+																
+//				TimeSeriesSimulationPlotter logInvestments = new TimeSeriesSimulationPlotter("Log Investments", "Log");
+//				logInvestments.addSeries("Log Inv. Sub.", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalSubsitionaryInvestment_cFirms));
+//				logInvestments.addSeries("Log Inv. Exp.", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalExpansionaryInvestment_cFirms));
+//				logInvestments.setName("Investment");
+//				updateChartSet.add(logInvestments);			//Add to set to be updated in buildSchedule method
+//			    tabSet.add(logInvestments);					//Tab will be created for this chart
+////				GuiUtils.addWindow(logInvestments, 0, 400, 500, 200);
+
+				Set<JInternalFrame> productivityPlots = new LinkedHashSet<JInternalFrame>();
+				TimeSeriesSimulationPlotter logProductivityMomentsC = new TimeSeriesSimulationPlotter("cFirms: Mean Log Productivity", "Log");
+				logProductivityMomentsC.addSeries("Mean Log Productivity", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.meanLogProductivity_cFirms));
+//				logProductivityMomentsC.setName("Moments prod. C-firms");
+				updateChartSet.add(logProductivityMomentsC);			//Add to set to be updated in buildSchedule method
+				productivityPlots.add(logProductivityMomentsC);
+//			    tabSet.add(logProductivityMomentsC);					//Tab will be created for this chart
+//				GuiUtils.addWindow(logProductivityMomentsC, 500, 0, 400, 200);				
+				TimeSeriesSimulationPlotter logProductivityMomentsK = new TimeSeriesSimulationPlotter("kFirms: Mean Log Productivity", "Log");
+				logProductivityMomentsK.addSeries("Mean Log Productivity", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.meanLogProductivity_kFirms));
+//				logProductivityMomentsK.setName("Moments prod. K-firms");
+				updateChartSet.add(logProductivityMomentsK);			//Add to set to be updated in buildSchedule method
+				productivityPlots.add(logProductivityMomentsK);
+//			    tabSet.add(logProductivityMomentsK);					//Tab will be created for this chart
 //				GuiUtils.addWindow(logProductivityMomentsK, 500, 200, 400, 200);
+				tabSet.add(createScrollPaneFromPlots(productivityPlots, "Productivity", productivityPlots.size()));
 				
-				TimeSeriesSimulationPlotter investmentLumpinessLow = new TimeSeriesSimulationPlotter("Inv. lumpiness", "%");
-				investmentLumpinessLow.addSeries("I/K < 0.02", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LowInv));
-				investmentLumpinessLow.setName("Inv. lumpiness (Low)");
-				updateChartSetDosiCompare.add(investmentLumpinessLow);			//Add to set to be updated in buildSchedule method
-			    tabSetDosiCompare.add(investmentLumpinessLow);					//Tab will be created for this chart
-//				GuiUtils.addWindow(investmentLumpinessLow, 900, 0, 400, 200);
+//				TimeSeriesSimulationPlotter investmentLumpinessLow = new TimeSeriesSimulationPlotter("Inv. lumpiness", "%");
+//				investmentLumpinessLow.addSeries("I/K < 0.02", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LowInv));
+//				investmentLumpinessLow.setName("Inv. lumpiness (Low)");
+//				updateChartSet.add(investmentLumpinessLow);			//Add to set to be updated in buildSchedule method
+//			    tabSet.add(investmentLumpinessLow);					//Tab will be created for this chart
+////				GuiUtils.addWindow(investmentLumpinessLow, 900, 0, 400, 200);
+//				
+//				TimeSeriesSimulationPlotter investmentLumpinessHigh = new TimeSeriesSimulationPlotter("Inv. lumpiness", "%");
+//				investmentLumpinessHigh.addSeries("I/K > 0.35", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.HighInv));
+//				investmentLumpinessHigh.setName("Inv. lumpiness (High)");
+//				updateChartSet.add(investmentLumpinessHigh);			//Add to set to be updated in buildSchedule method
+//			    tabSet.add(investmentLumpinessHigh);					//Tab will be created for this chart
+////				GuiUtils.addWindow(investmentLumpinessHigh, 900, 200, 400, 200);
 				
-				TimeSeriesSimulationPlotter investmentLumpinessHigh = new TimeSeriesSimulationPlotter("Inv. lumpiness", "%");
-				investmentLumpinessHigh.addSeries("I/K > 0.35", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.HighInv));
-				investmentLumpinessHigh.setName("Inv. lumpiness (High)");
-				updateChartSetDosiCompare.add(investmentLumpinessHigh);			//Add to set to be updated in buildSchedule method
-			    tabSetDosiCompare.add(investmentLumpinessHigh);					//Tab will be created for this chart
-//				GuiUtils.addWindow(investmentLumpinessHigh, 900, 200, 400, 200);
-				
-				TimeSeriesSimulationPlotter inflations = new TimeSeriesSimulationPlotter("Inflations", "%");
-				inflations.addSeries("Cpi inflation", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumerInflation_cFirms));
-				inflations.addSeries("Ppi inflation", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProducerInflation_kFirms));
-				inflations.setName("Inflation");
-				updateChartSetDosiCompare.add(inflations);			//Add to set to be updated in buildSchedule method
-			    tabSetDosiCompare.add(inflations);					//Tab will be created for this chart
+			}
+				TimeSeriesSimulationPlotter inflation = new TimeSeriesSimulationPlotter("Inflation", "%");
+				inflation.addSeries("CPI inflation", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumerInflationPercent_cFirms));
+				inflation.addSeries("PPI inflation", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProducerInflationPercent_kFirms));
+				inflation.setName("Inflation");
+				updateChartSet.add(inflation);			//Add to set to be updated in buildSchedule method
+			    tabSet.add(inflation);					//Tab will be created for this chart
 //				GuiUtils.addWindow(inflations, 500, 400, 400, 200);
 				
-				TimeSeriesSimulationPlotter government = new TimeSeriesSimulationPlotter("Government", "% of GDP");
-				government.addSeries("Balance", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovBalanceToGDPpercent));
-				government.addSeries("Debt", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovStockToGDPpercent));
-				government.setName("Government");
-				updateChartSetDosiCompare.add(government);			//Add to set to be updated in buildSchedule method
-			    tabSetDosiCompare.add(government);					//Tab will be created for this chart
-//				GuiUtils.addWindow(government, 900, 400, 400, 200);
-
-			    
-			    //-------------------------------------------------------------------------------------------------------
-			    //
-		    	//	BUILD A TABBED PANE HOLDING ALL THE CHARTS THAT ONLY UPDATE AT EACH TIME-STEP (not convergence plots)
-			    //
-		    	//-------------------------------------------------------------------------------------------------------
-			    
-		        //Create tabbed pane to hold all the charts and add to the JAS-mine GUI window
-		    	JInternalFrame chartsFrame = new JInternalFrame("Charts");
-				JTabbedPane tabbedPane = new JTabbedPane();
-				chartsFrame.add(tabbedPane);
-				
-				for(JComponent plot: tabSetDosiCompare) {
-					tabbedPane.addTab(plot.getName(), plot);
-				}
-				tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		    	chartsFrame.setResizable(true);
-		    	chartsFrame.setMaximizable(true);
-				GuiUtils.addWindow(chartsFrame, 300, 0, 1560, 660);
-			    
-			    
+//				TimeSeriesSimulationPlotter government = new TimeSeriesSimulationPlotter("Government", "% of GDP");
+//				government.addSeries("Balance to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovBalanceToGDPpercent));
+//				government.addSeries("Stock to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovStockToGDPpercent));
+//				government.setName("Government");
+//				updateChartSet.add(government);			//Add to set to be updated in buildSchedule method
+//			    tabSet.add(government);					//Tab will be created for this chart
+////				GuiUtils.addWindow(government, 900, 400, 400, 200);
+			    			
+			
+			
+			
+		    //-------------------------------------------------------------------------------------------------------
+		    //
+	    	//	BUILD A TABBED PANE HOLDING ALL THE CHARTS THAT ONLY UPDATE AT EACH TIME-STEP
+		    //
+	    	//-------------------------------------------------------------------------------------------------------
+		    
+	        //Create tabbed pane to hold all the charts and add to the JAS-mine GUI window
+	    	JInternalFrame chartsFrame = new JInternalFrame("Charts");
+			JTabbedPane tabbedPane = new JTabbedPane();
+			chartsFrame.add(tabbedPane);
+			
+			for(JComponent plot: tabSet) {
+				tabbedPane.addTab(plot.getName(), plot);
 			}
+			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	    	chartsFrame.setResizable(true);
+	    	chartsFrame.setMaximizable(true);
+			GuiUtils.addWindow(chartsFrame, 300, 0, 1560, 660);
+			    			 
 		}
 		
 		log.debug("Object created");
@@ -534,7 +517,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			} else {
 				
 				EventGroup observerEventGroup = new EventGroup();
-				for(JInternalFrame plot: updateChartSetDosiCompare) {
+				for(JInternalFrame plot: updateChartSet) {
 					observerEventGroup.addEvent(plot, CommonEventType.Update);
 				}
 				getEngine().getEventQueue().scheduleRepeat(observerEventGroup, 0, Parameters.OBSERVER_ORDERING, chartUpdatePeriod);

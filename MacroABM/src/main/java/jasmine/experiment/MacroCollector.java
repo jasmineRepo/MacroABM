@@ -9,13 +9,11 @@ import microsim.engine.SimulationEngine;
 import microsim.engine.SimulationManager;
 import microsim.event.EventGroup;
 import microsim.event.EventListener;
-import microsim.gui.plot.TimeSeriesSimulationPlotter;
 import microsim.statistics.CrossSection;
 import microsim.statistics.IDoubleSource;
 import microsim.statistics.IIntSource;
 import microsim.statistics.functions.MaxArrayFunction;
 import microsim.statistics.functions.MeanArrayFunction;
-import microsim.statistics.functions.MultiTraceFunction;
 //import microsim.statistics.functions.MeanVarianceArrayFunction;
 import microsim.statistics.functions.SumArrayFunction;
 
@@ -431,8 +429,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		TotalSubstitutionaryInvestment_cFirms,
 		LogTotalExpansionaryInvestment_cFirms,
 		LogTotalSubsitionaryInvestment_cFirms,
-		ConsumerInflation_cFirms,
-		ProducerInflation_kFirms,
+		ConsumerInflationPercent_cFirms,
+		ProducerInflationPercent_kFirms,
 		meanLogProductivity_kFirms,
 		meanLogProductivity_cFirms,
 		LowInv,
@@ -690,10 +688,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		case GdpGrowth:
 			return gdpGrowth;
 			
-		case ConsumerInflation_cFirms:
-			return (cpi[1] - cpi[0]) / cpi[0];
-		case ProducerInflation_kFirms:
-			return (ppi[1] - ppi[0]) / ppi[0];
+		case ConsumerInflationPercent_cFirms:
+			return 100. * (cpi[1] - cpi[0]) / cpi[0];
+		case ProducerInflationPercent_kFirms:
+			return 100. * (ppi[1] - ppi[0]) / ppi[0];
 			
 		case GovBalanceToGDPpercent:
 			return 100. * govBalanceToGdp;
