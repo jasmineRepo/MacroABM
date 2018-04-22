@@ -98,6 +98,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 		    TimeSeriesSimulationPlotter expenditurePlot = new TimeSeriesSimulationPlotter("Expenditure", "%"); 
 			expenditurePlot.addSeries("Consumption To GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionToGDPpercent));
 			expenditurePlot.addSeries("Investment to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InvestmentToGDPpercent));
+			expenditurePlot.addSeries("Inventories (Consumption Goods)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.TotalInventoriesToGDPpercent));
 			expenditurePlot.addSeries("Government Spending to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovSpendingToGDPpercent));			
 			updateChartSet.add(expenditurePlot);			//Add to set to be updated in buildSchedule method
 			accountingPlots.add(expenditurePlot); 							    			    			    
