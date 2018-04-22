@@ -454,6 +454,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		LogProfit_kFirms,
 		Profit_kFirms,
 		ProfitToGDPpercent_kFirms,
+		FirmAndBankProfitsToGDPpercent,
+		WagesPlusUnemploymentBenefitsToGDPpercent,
 		MaxClientsPerFirm_kFirms,
 		TotalInventories,
 		TotalInventoriesToGDPpercent,
@@ -525,36 +527,48 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 				return Math.log(profit_cFirms);
 			else return Double.NaN;
 		case LogProfit_kFirms:
-			if(profit_kFirms > 0)
+			if(profit_kFirms > 0.)
 				return Math.log(profit_kFirms);
 			else return Double.NaN;
+			
 		case Profit_kFirms:
 			return this.profit_kFirms;
 
 		case ProfitToGDPpercent_kFirms:
-			if(gdp[1] > 0)
+			if(gdp[1] > 0.)
 				return 100. * profit_kFirms / gdp[1];
 			else return Double.NaN;
 			
 		case ProfitToGDPpercent_cFirms:
-			if(gdp[1] > 0)
+			if(gdp[1] > 0.)
 				return 100. * profit_cFirms / gdp[1];
 			else return Double.NaN;
 			
+		case FirmAndBankProfitsToGDPpercent:
+			if(gdp[1] > 0.)
+				return 100. * (profit_cFirms + profit_kFirms + model.getBank().profit) / gdp[1];
+			else return Double.NaN;
+			
+		case WagesPlusUnemploymentBenefitsToGDPpercent:
+			if(gdp[1] > 0.)
+				return 100. * wage[1] * (1 + unemployment * model.getUnemploymentBenefitShare()) / gdp[1];
+			else return Double.NaN;
+			
 		case LogConsumption:
-			if(consumption[1] > 0)
+			if(consumption[1] > 0.)
 				return Math.log(this.consumption[1]);
 			else 
 				return Double.NaN;
 		case LogConsumptionReal:
-			if(realConsumption > 0)
+			if(realConsumption > 0.)
 				return Math.log(this.realConsumption);
 			else 
 				return Double.NaN;
 		case TotalLiquidAssets_cFirms:
 				return this.totalLiquidAssets_cFirms;
+				
 		case LogTotalLiquidAssets_kFirms:
-			if(totalLiquidAssets_kFirms > 0)
+			if(totalLiquidAssets_kFirms > 0.)
 				return Math.log(this.totalLiquidAssets_kFirms);
 			else 
 				return Double.NaN;
