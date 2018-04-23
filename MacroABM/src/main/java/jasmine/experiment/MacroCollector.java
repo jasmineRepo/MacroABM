@@ -420,10 +420,13 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	
 	// These methods mainly allow to transform the aggregate variables computed here in time series, and then to plot them in the observer
 	public enum Variables {
+		InterestRate,
 		UnemploymentRatePercent,
 		LogGDP,
 		LogTotalInvestment,
 //		ConsumptionLog,
+		LogPastConsumption,
+		LogRealConsumption,
 		ConsumptionToGDPpercent,
 		InvestmentToGDPpercent,
 		GdpGrowth,
@@ -445,6 +448,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		GovBalanceToGDPpercent,
 		GovStockToGDPpercent,
 		GovSpendingToGDPpercent,
+		LogGovSpending,
 		LogCreditDemand, 
 		LogMeanProductivityWeightedByMarketShare_kFirms,
 		LogMeanMachineProductivityWeightedByMarketShare,
@@ -460,6 +464,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		WagesPlusUnemploymentBenefitsToGDPpercent,
 		MaxClientsPerFirm_kFirms,
 		TotalInventories,
+		LogDiffInventories_cFirms,
+		LogDiffInventoriesNominal_cFirms,
 		DiffTotalInventoriesToGDPpercent,
 		AverageAgeMachine_cFirms,
 		LogRandDexpenditures_kFirms,
@@ -479,7 +485,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		LogCapitalStockTopLimit,
 		LogDesiredExpansionaryInvestmentTotal_cFirms,
 		LogDesiredExpansionaryInvestmentTotalStar_cFirms,
-
+		LogProduction_kFirms,
+		LogProductionNominal_kFirms,
+		LogProductionNominal_cFirms,
+		
 		ActualExpansionaryInvestmentToGDPpercent_cFirms,
 		DesiredExpansionaryInvestmentToGDPpercent_cFirms,
 		DesiredExpansionaryInvestmentStarToGDPpercent_cFirms,
@@ -491,6 +500,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		LaborRationingRatio,
 		LogBadDebt,
 		LogWage,
+		Wage,
 //		Flag,
 		Empty,
 		ExitPercent_kFirms,
@@ -522,6 +532,15 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return this.totalInventories;
 		case DiffTotalInventoriesToGDPpercent:
 			return 100. * diffTotalInventoriesNominal / gdpNominal;
+		case LogDiffInventoriesNominal_cFirms:
+			if(diffTotalInventoriesNominal > 0.)
+				return Math.log(diffTotalInventoriesNominal);
+			else return Double.NaN;
+		case LogDiffInventories_cFirms:
+			if(diffTotalInventories > 0.)
+				return Math.log(diffTotalInventories);
+			else return Double.NaN;			
+			
 		case TotalMarkUp_cFirms:
 			return this.markUpTot_cFirms;
 		case LogProfit_cFirms:
@@ -614,6 +633,19 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			else 
 				return Double.NaN;
 			
+		case LogProduction_kFirms:
+			if(production_kFirms > 0.)
+				return Math.log(production_kFirms);
+			else return Double.NaN;
+			
+		case LogProductionNominal_kFirms:
+			if(productionNominal_kFirms > 0.)
+				return Math.log(productionNominal_kFirms);
+			else return Double.NaN;
+		case LogProductionNominal_cFirms:
+			if(productionNominal_cFirms > 0.)
+				return Math.log(productionNominal_cFirms);
+			else return Double.NaN;
 			
 		case ActualExpansionaryInvestmentToGDPpercent_cFirms:
 			if(gdp[1] > 0)
@@ -658,6 +690,9 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			
 		// end
 		
+		case InterestRate:
+			return model.getInterestRate();
+			
 		case UnemploymentRatePercent:
 			return 100. * unemploymentRate[1];
 			
@@ -668,6 +703,16 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return 100. * aggConsumption / gdpNominal;
 //			return 100. * consumption[1] / gdpNominal;
 //			return 100. * realConsumption / gdp[1];
+			
+		case LogRealConsumption:
+			if(realConsumption > 0.)
+				return Math.log(realConsumption);
+			else return Double.NaN;
+			
+		case LogPastConsumption:
+			if(pastConsumption > 0.)
+				return Math.log(pastConsumption);
+			else return Double.NaN;
 			
 		case InvestmentToGDPpercent:
 			return 100. * (investmentExpansionaryTotal_cFirms + investmentSubstitutionaryTotal_cFirms) / gdpNominal;
@@ -718,6 +763,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return 100. * govStockToGdp;
 		case GovSpendingToGDPpercent:
 			return 100. * govSpendingToGdp;
+		case LogGovSpending:
+			if(govSpending > 0.)
+				return Math.log(govSpending);
+			else return Double.NaN;
 			
 		case LogCreditDemand:
 			if(aggregateCreditDemand > 1)
@@ -727,6 +776,9 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			
 		case LogWage:
 			return Math.log(wage[1]);
+		
+		case Wage:
+			return wage[1];
 			
 		case LogBadDebt:
 //			return totalBadDebt;
@@ -972,6 +1024,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		// Compute aggregate consumption
 		// Add the past consumption non-matched by the consumption-good firms' production to the current aggregate consumption
 		this.consumption[1] 			= laborDemand * wage[1] + govSpending + pastConsumption * (1 + model.getInterestRate());
+//		this.consumption[1] 			= laborDemand * wage[1] + govSpending;
 		aggConsumption					= laborDemand * wage[1] + govSpending; 			//This is the equation in Dosi et al. (2013) page 1754, so why do we need to add on the extra term featuring pastConsumption above???
 		
 		log.fatal("Consumption variables: " + 
@@ -1116,9 +1169,11 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		this.meanLogProductivity_kFirms 				= 0;
 		this.herfindahlMeasure_kFirms 					= 0; // Herfindahl measure 
 		this.maxClientsPerFirm_kFirms 					= 0; // maximal number of clients
+		productionNominal_kFirms						= 0;
 		
 		for(KFirm kFirm : model.getKFirms()){
 			if(production_kFirms > 0){
+				productionNominal_kFirms 		+= kFirm.getProductionQuantity() * kFirm.getPriceOfGoodProducedNow();
 				this.meanProductivityWeightedByMarketShare_kFirms += kFirm.getProductivity()[1] * kFirm.getMarketShare()[2];
 				this.meanMachineProductivityWeightedByMarketShare += kFirm.getMachineProduced().getA()[1] * kFirm.getMarketShare()[2];
 			} else {
