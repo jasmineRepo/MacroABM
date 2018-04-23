@@ -169,7 +169,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				interestRatePlot.addSeries("Interest Rate", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InterestRate));
 				updateChartSet.add(interestRatePlot);			//Add to set to be updated in buildSchedule method
 				consumptionPlots.add(interestRatePlot);
-				tabSet.add(createScrollPaneFromPlots(consumptionPlots, "Consumption Checks", consumptionPlots.size()));
+				tabSet.add(createScrollPaneFromPlots(consumptionPlots, "Consumption Components", consumptionPlots.size()));
 			}
 			
 			
@@ -187,7 +187,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				diffInventoriesPlot.addSeries("Diff in Inventories", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDiffInventories_cFirms));
 				updateChartSet.add(diffInventoriesPlot);			//Add to set to be updated in buildSchedule method
 				gdpPlots.add(diffInventoriesPlot); 							    
-				tabSet.add(createScrollPaneFromPlots(gdpPlots, "GDP checks", gdpPlots.size()));
+				tabSet.add(createScrollPaneFromPlots(gdpPlots, "GDP components", gdpPlots.size()));
 			}
 			
 			if(nominalGDPcomponents) {
@@ -204,7 +204,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				diffInventoriesNominalPlot.addSeries("Diff in Nominal Inventories", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDiffInventoriesNominal_cFirms));
 				updateChartSet.add(diffInventoriesNominalPlot);			//Add to set to be updated in buildSchedule method
 				gdpNominalPlots.add(diffInventoriesNominalPlot); 							    
-				tabSet.add(createScrollPaneFromPlots(gdpNominalPlots, "Nominal GDP checks", gdpNominalPlots.size()));
+				tabSet.add(createScrollPaneFromPlots(gdpNominalPlots, "Nominal GDP components", gdpNominalPlots.size()));
 			}
 			
 			if(nationalAccounts) {
@@ -307,7 +307,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 					capital.addSeries("Actual Stock (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogCapitalStock_cFirms));
 					capital.addSeries("Desired Stock (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDesiredCapitalStock_cFirms));
 					capital.addSeries("Top Limit of Stock (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogCapitalStockTopLimit));
-					capital.setName("Capital");
+					capital.setName("Capital Stock");
 					updateChartSet.add(capital);			//Add to set to be updated in buildSchedule method
 				    tabSet.add(capital);
 	//				GuiUtils.addWindow(capital, 600, 0, 300, 250);
@@ -378,7 +378,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 					goodMarket.addSeries("Production (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogProduction_cFirms));
 					goodMarket.addSeries("Consumption (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogConsumption));
 					goodMarket.addSeries("Total Desired Production (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalDesiredProduction_cFirms));
-					goodMarket.setName("Goods Market");
+					goodMarket.setName("Consumption Goods Market");
 					updateChartSet.add(goodMarket);			//Add to set to be updated in buildSchedule method
 				    tabSet.add(goodMarket);					//Tab will be created for this chart
 	//				GuiUtils.addWindow(goodMarket, 300, 250, 300, 250);
@@ -461,7 +461,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				government.addSeries("Balance (revenues - spending) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovBalanceToGDPpercent));
 				government.addSeries("Stock (accumulated Balance over time) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovStockToGDPpercent));
 				government.addSeries("Spending to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovSpendingToGDPpercent));
-				government.setName("Government");
+				government.setName("Government Ratios");
 				updateChartSet.add(government);			//Add to set to be updated in buildSchedule method
 			    tabSet.add(government);					//Tab will be created for this chart
 	//				GuiUtils.addWindow(government, 600, 500, 300, 250);
