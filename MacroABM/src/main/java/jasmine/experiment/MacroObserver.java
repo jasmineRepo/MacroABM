@@ -98,8 +98,8 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 		    TimeSeriesSimulationPlotter expenditurePlot = new TimeSeriesSimulationPlotter("Expenditure", "%"); 
 			expenditurePlot.addSeries("Consumption To GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionToGDPpercent));
 			expenditurePlot.addSeries("Investment to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InvestmentToGDPpercent));
-			expenditurePlot.addSeries("Inventories (Consumption Goods)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.TotalInventoriesToGDPpercent));
-			expenditurePlot.addSeries("Government Spending to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovSpendingToGDPpercent));			
+			expenditurePlot.addSeries("Change in Inventories (Consumption Goods) to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.DiffTotalInventoriesToGDPpercent));
+//			expenditurePlot.addSeries("Government Spending to GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovSpendingToGDPpercent));			
 			updateChartSet.add(expenditurePlot);			//Add to set to be updated in buildSchedule method
 			accountingPlots.add(expenditurePlot); 							    			    			    
 			TimeSeriesSimulationPlotter incomePlot = new TimeSeriesSimulationPlotter("Income", "%");
@@ -317,8 +317,8 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 //			    tabSet.add(inventories);					//Tab will be created for this chart
 ////				GuiUtils.addWindow(inventories, 300, 500, 300, 250);
 
-				TimeSeriesSimulationPlotter inventoriesToGDP = new TimeSeriesSimulationPlotter("Inventories To GDP", "%"); 
-				inventoriesToGDP.addSeries("Total Consumption Sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.TotalInventoriesToGDPpercent));
+				TimeSeriesSimulationPlotter inventoriesToGDP = new TimeSeriesSimulationPlotter("Change in Inventories To GDP ratio", "%"); 
+				inventoriesToGDP.addSeries("Consumption Good Firms", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.DiffTotalInventoriesToGDPpercent));
 				inventoriesToGDP.setName("Inventories To GDP");
 				updateChartSet.add(inventoriesToGDP);			//Add to set to be updated in buildSchedule method
 			    tabSet.add(inventoriesToGDP);					//Tab will be created for this chart

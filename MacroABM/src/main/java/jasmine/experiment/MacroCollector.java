@@ -90,8 +90,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	// the two following variables are mainly used for the computation of the c-firms' competitiveness and market share 
 	public double[] cpi; // consumer price index (price of cFirms)
 	
-	public double production_cFirms; // production real in the consumption sector, was productionCons.
-	public double productionNominal_cFirms; // production nominal in the consumption sector, was productionNomCons.
+	public double production_cFirms; // real production in the consumption sector, was productionCons.
+	public double productionNominal_cFirms; // nominal production in the consumption sector, was productionNomCons.
 	public CrossSection.Double csTotalProduction_cFirms; // total production, consumption sector, was csTotalProdCons.
 	public SumArrayFunction fSumTotalProduction_cFirms; //was fSumTotalProdCons
 	
@@ -111,8 +111,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	
 	// Capital market
 	public double production_kFirms;	//was productionCapital.
-	public double productionNominal_kFirms; // production nominal in the capital sector, was productionNomCapital.
-	public CrossSection.Double csTotalProduction_kFirms; // total production, capital sector, was csTotalProdCapital.
+	public double productionNominal_kFirms; // nominal production in the capital goods sector, was productionNomCapital.
+	public CrossSection.Double csTotalProduction_kFirms; // total production, capital goods sector, was csTotalProdCapital.
 	public SumArrayFunction fSumTotalProduction_kFirms; //was fSumTotalProdCapital.
 	public double[] ppi; // production price index (price of KFirms)
 	
@@ -223,6 +223,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	public double govSpendingToGdp; // ratio of the gov's spending to gdp, was govSpendingGdp
 	
 	MacroModel model;
+
+	private double aggConsumption;
 
 //	private MeanVarianceArrayFunction fMeanVarianceLiquidityToSalesRatio_cFirms;
 	
@@ -458,7 +460,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		WagesPlusUnemploymentBenefitsToGDPpercent,
 		MaxClientsPerFirm_kFirms,
 		TotalInventories,
-		TotalInventoriesToGDPpercent,
+		DiffTotalInventoriesToGDPpercent,
 		AverageAgeMachine_cFirms,
 		LogRandDexpenditures_kFirms,
 		LogConsumption,
@@ -518,8 +520,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return this.avgAgeMachines_cFirms;
 		case TotalInventories:
 			return this.totalInventories;
-		case TotalInventoriesToGDPpercent:
-			return 100. * totalInventories / gdp[1];
+		case DiffTotalInventoriesToGDPpercent:
+			return 100. * diffTotalInventoriesNominal / gdpNominal;
 		case TotalMarkUp_cFirms:
 			return this.markUpTot_cFirms;
 		case LogProfit_cFirms:
@@ -536,27 +538,28 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 
 		case ProfitToGDPpercent_kFirms:
 			if(gdp[1] > 0.)
-				return 100. * profit_kFirms / gdp[1];
+				return 100. * profit_kFirms / gdpNominal;
 			else return Double.NaN;
 			
 		case ProfitToGDPpercent_cFirms:
 			if(gdp[1] > 0.)
-				return 100. * profit_cFirms / gdp[1];
+				return 100. * profit_cFirms / gdpNominal;
 			else return Double.NaN;
 			
 		case FirmAndBankProfitsToGDPpercent:
 			if(gdp[1] > 0.)
-				return 100. * (profit_cFirms + profit_kFirms + model.getBank().profit) / gdp[1];
+				return 100. * (profit_cFirms + profit_kFirms + model.getBank().profit) / gdpNominal;
 			else return Double.NaN;
 			
 		case WagesPlusUnemploymentBenefitsToGDPpercent:
 			if(gdp[1] > 0.)
-				return 100. * wage[1] * (1 + unemployment * model.getUnemploymentBenefitShare()) / gdp[1];
+				return 100. * wage[1] * (1 + unemployment * model.getUnemploymentBenefitShare()) / gdpNominal;
 			else return Double.NaN;
 			
 		case LogConsumption:
 			if(consumption[1] > 0.)
-				return Math.log(this.consumption[1]);
+//				return Math.log(this.consumption[1]);
+				return Math.log(this.aggConsumption);
 			else 
 				return Double.NaN;
 		case LogConsumptionReal:
@@ -614,22 +617,22 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			
 		case ActualExpansionaryInvestmentToGDPpercent_cFirms:
 			if(gdp[1] > 0)
-				return 100. * investmentExpansionaryTotal_cFirms / gdp[1];
+				return 100. * investmentExpansionaryTotal_cFirms / gdpNominal;
 			else return Double.NaN;
 			
 		case DesiredExpansionaryInvestmentToGDPpercent_cFirms:
 			if(gdp[1] > 0)
-				return 100. * desiredExpansionaryInvestmentTotal_cFirms / gdp[1];
+				return 100. * desiredExpansionaryInvestmentTotal_cFirms / gdpNominal;
 			else return Double.NaN;
 			
 		case DesiredExpansionaryInvestmentStarToGDPpercent_cFirms:
 			if(gdp[1] > 0)
-				return 100. * desiredExpansionaryInvestmentTotalStar_cFirms / gdp[1];
+				return 100. * desiredExpansionaryInvestmentTotalStar_cFirms / gdpNominal;
 			else return Double.NaN;
 			
 		case ActualSubsitionaryInvestmentToGDPpercent_cFirms:
 			if(gdp[1] > 0)
-				return 100. * investmentSubstitutionaryTotal_cFirms / gdp[1];
+				return 100. * investmentSubstitutionaryTotal_cFirms / gdpNominal;
 			else return Double.NaN;
 			
 	
@@ -662,10 +665,12 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return gdpLog;
 			
 		case ConsumptionToGDPpercent:
-			return 100. * consumption[1] / gdp[1];
+			return 100. * aggConsumption / gdpNominal;
+//			return 100. * consumption[1] / gdpNominal;
+//			return 100. * realConsumption / gdp[1];
 			
 		case InvestmentToGDPpercent:
-			return 100. * (investmentExpansionaryTotal_cFirms + investmentSubstitutionaryTotal_cFirms) / gdp[1];
+			return 100. * (investmentExpansionaryTotal_cFirms + investmentSubstitutionaryTotal_cFirms) / gdpNominal;
 			
 		case LogTotalInvestment:
 			if(investmentExpansionaryTotal_cFirms + investmentSubstitutionaryTotal_cFirms > 0) {
@@ -967,6 +972,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		// Compute aggregate consumption
 		// Add the past consumption non-matched by the consumption-good firms' production to the current aggregate consumption
 		this.consumption[1] 			= laborDemand * wage[1] + govSpending + pastConsumption * (1 + model.getInterestRate());
+		aggConsumption					= laborDemand * wage[1] + govSpending; 			//This is the equation in Dosi et al. (2013) page 1754, so why do we need to add on the extra term featuring pastConsumption above???
 		
 		log.fatal("Consumption variables: " + 
 					"\n Gov. spending " + govSpending + 
