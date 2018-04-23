@@ -112,11 +112,11 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			
 			
 		    //Create chart containing time-series' of log GDP, log consumption and log total investment
-			TimeSeriesSimulationPlotter logOutputConsumptionInvestment = new TimeSeriesSimulationPlotter("Aggregate Time Series", "Log");
+			TimeSeriesSimulationPlotter logOutputConsumptionInvestment = new TimeSeriesSimulationPlotter("GDP, Consumption and Investment", "Log");
 			logOutputConsumptionInvestment.addSeries("Log GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogGDP));
 			logOutputConsumptionInvestment.addSeries("Log Consumption", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogConsumption));
 			logOutputConsumptionInvestment.addSeries("Log Investment", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalInvestment));
-			logOutputConsumptionInvestment.setName("Output, Consumption and Investment");
+			logOutputConsumptionInvestment.setName("GDP, Consumption and Investment");
 			updateChartSet.add(logOutputConsumptionInvestment);			//Add to set to be updated in buildSchedule method
 		    tabSet.add(logOutputConsumptionInvestment);
 //			GuiUtils.addWindow(logOutputConsumptionInvestment, 0, 0, 300, 250);
