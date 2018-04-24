@@ -461,6 +461,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		Profit_kFirms,
 		ProfitToGDPpercent_kFirms,
 		FirmAndBankProfitsToGDPpercent,
+		ConsumptionPlusFirmAndBankProfitsToGDPpercent,
+		ChangeInInventoriesPlusConsumptionPlusFirmAndBankProfitsToGDPpercent,
 		WagesPlusUnemploymentBenefitsToGDPpercent,
 		MaxClientsPerFirm_kFirms,
 		TotalInventories,
@@ -568,6 +570,16 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		case FirmAndBankProfitsToGDPpercent:
 			if(gdp[1] > 0.)
 				return 100. * (profit_cFirms + profit_kFirms + model.getBank().profit) / gdpNominal;
+			else return Double.NaN;
+			
+		case ConsumptionPlusFirmAndBankProfitsToGDPpercent:
+			if(gdp[1] > 0.)
+				return 100. * (aggConsumption + profit_cFirms + profit_kFirms + model.getBank().profit) / gdpNominal;
+			else return Double.NaN;
+			
+		case ChangeInInventoriesPlusConsumptionPlusFirmAndBankProfitsToGDPpercent:
+			if(gdp[1] > 0.)
+				return 100. * (diffTotalInventoriesNominal + aggConsumption + profit_cFirms + profit_kFirms + model.getBank().profit) / gdpNominal;
 			else return Double.NaN;
 			
 		case WagesPlusUnemploymentBenefitsToGDPpercent:

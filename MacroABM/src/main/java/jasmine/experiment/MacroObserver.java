@@ -75,11 +75,11 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 	//Boolean GUI parameter toggles to switch a particular chart on / off
 	
 	@GUIparameter(description = "Toggle to turn chart on / off")
-	private boolean consumptionComponents = true;
+	private boolean consumptionComponents = false;
 	@GUIparameter(description = "Toggle to turn chart on / off")
-	private boolean gdpComponents = true;
+	private boolean gdpComponents = false;
 	@GUIparameter(description = "Toggle to turn chart on / off")
-	private boolean nominalGDPcomponents = true;
+	private boolean nominalGDPcomponents = false;
 	@GUIparameter(description = "Toggle to turn chart on / off")
 	private boolean nationalAccounts = true;
 	@GUIparameter(description = "Toggle to turn chart on / off")
@@ -221,6 +221,13 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				incomePlot.addSeries("Profits to GDP (Firms + Bank)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.FirmAndBankProfitsToGDPpercent));
 				updateChartSet.add(incomePlot);			//Add to set to be updated in buildSchedule method
 				accountingPlots.add(incomePlot);
+				
+				TimeSeriesSimulationPlotter consumptionPlusProftsPlot = new TimeSeriesSimulationPlotter("(Consumption + Profits) / GDP", "%");
+				consumptionPlusProftsPlot.addSeries("Consumption + Profits) / GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionPlusFirmAndBankProfitsToGDPpercent));
+//				consumptionPlusProftsPlot.addSeries("Change in Inventories + Consumption + Profits) / GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ChangeInInventoriesPlusConsumptionPlusFirmAndBankProfitsToGDPpercent));
+				updateChartSet.add(consumptionPlusProftsPlot);			//Add to set to be updated in buildSchedule method
+				accountingPlots.add(consumptionPlusProftsPlot);
+				
 				tabSet.add(createScrollPaneFromPlots(accountingPlots, "National Accounts", accountingPlots.size()));
 			}
 			
