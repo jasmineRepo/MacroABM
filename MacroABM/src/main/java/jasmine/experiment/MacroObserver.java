@@ -75,7 +75,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 	//Boolean GUI parameter toggles to switch a particular chart on / off
 	
 	@GUIparameter(description = "Toggle to turn chart on / off")
-	private boolean acountingIdentities = true;
+	private boolean acountingIdentities = false;
 	@GUIparameter(description = "Toggle to turn chart on / off")
 	private boolean consumptionComponents = false;
 	@GUIparameter(description = "Toggle to turn chart on / off")
@@ -83,7 +83,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 	@GUIparameter(description = "Toggle to turn chart on / off")
 	private boolean nominalGDPcomponents = false;
 	@GUIparameter(description = "Toggle to turn chart on / off")
-	private boolean nationalAccounts = true;
+	private boolean nationalAccounts = false;
 	@GUIparameter(description = "Toggle to turn chart on / off")
 	private boolean gdpConsumptionInvestment = true;
 	@GUIparameter(description = "Toggle to turn chart on / off")
@@ -151,7 +151,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				
 				Set<JInternalFrame> accountingIdentitiesPlots = new LinkedHashSet<JInternalFrame>();
 			    TimeSeriesSimulationPlotter yPlot = new TimeSeriesSimulationPlotter("Y comparison", "Log"); 
-				yPlot.addSeries("Y = C + I + N", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogYcin));
+				yPlot.addSeries("Y = C + I + delta_N", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogYcin));
 				yPlot.addSeries("Y = Sum of production values", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogYproduction));
 				updateChartSet.add(yPlot);			//Add to set to be updated in buildSchedule method
 				accountingIdentitiesPlots.add(yPlot); 							    			    			    
