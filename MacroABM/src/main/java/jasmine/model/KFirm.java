@@ -47,7 +47,7 @@ public class KFirm extends Firm {
 	double laborDemandForRd; // labor demand only for R&D purpose 
 
 	@Transient
-	protected double[] productivity; // prod stands for productivity, was prod.
+	protected double[] firmProductivity; // prod stands for productivity, was prod.
 
 	protected double rdExpenditure; // r&d expenditures, was rd.
 
@@ -130,14 +130,14 @@ public class KFirm extends Firm {
 		
 		// --- Machine produced ---
 		Machine machine 				= new Machine(this); 
-		machine.setA(new double[]{Parameters.getInitialProductivity(), Parameters.getInitialProductivity()}); 
+		machine.setMachineProductivity(new double[]{Parameters.getInitialProductivity(), Parameters.getInitialProductivity()}); 
 		machine.setCost(Parameters.getInitialWage() / Parameters.getInitialProductivity()); 
 		machine.setVintage(0); 
 		this.machineProduced 			= machine; 
 		
 		// --- Productivity ---
-		this.productivity 						= new double[]{Parameters.getInitialProductivity(), Parameters.getInitialProductivity()}; 
-		this.costToProduceGood 							= Parameters.getInitialWage() / (productivity[1] * Parameters.getA_kFirms()); 
+		this.firmProductivity 						= new double[]{Parameters.getInitialProductivity(), Parameters.getInitialProductivity()}; 
+		this.costToProduceGood 							= Parameters.getInitialWage() / (firmProductivity[1] * Parameters.getA_kFirms()); 
 		this.priceOfGoodProduced 							= new double[]{ (1 + Parameters.getFixedMarkUp_kFirms()) * costToProduceGood, (1 + Parameters.getFixedMarkUp_kFirms()) * costToProduceGood}; 
 		
 		// --- Financial variables --- 
@@ -191,11 +191,11 @@ public class KFirm extends Firm {
 		// --- Machines --- 
 		this.rdExpenditure 						= copy.rdExpenditure;
 		this.machineProduced 			= new Machine(this);
-		this.machineProduced.setA(copy.machineProduced.getA().clone());
+		this.machineProduced.setMachineProductivity(copy.machineProduced.getMachineProductivity().clone());
 		this.machineProduced.setCost(copy.machineProduced.getCost());
 		
 		// --- Productivity ---
-		this.productivity 						= new double[]{copy.productivity[0], copy.productivity[1]};
+		this.firmProductivity 						= new double[]{copy.firmProductivity[0], copy.firmProductivity[1]};
 		this.priceOfGoodProduced 							= new double[]{copy.priceOfGoodProduced[0], copy.priceOfGoodProduced[1]};
 		this.costToProduceGood 							= copy.costToProduceGood;
 		this.marketShare 							= new double[]{0, 0, 0};
@@ -268,7 +268,7 @@ public class KFirm extends Firm {
 		// Set the firm's sales equal to 0 because they are increased incrementally from the CFirm class 
 		this.sales[1] 					= 0;
 		this.machineProduced.update(); // update a(t) = a(t-1)
-		this.productivity[0] 					= productivity[1];
+		this.firmProductivity[0] 					= firmProductivity[1];
 		
 	}
 	
@@ -313,36 +313,36 @@ public class KFirm extends Firm {
 											Parameters.getMachinePaybackPeriod_cFirms() * collector.wage[1] / aInn;
 		double realPriceIm 				= (1 + Parameters.getFixedMarkUp_kFirms()) * collector.wage[1] / (bIm * Parameters.getA_kFirms()) + 
 											Parameters.getMachinePaybackPeriod_cFirms() * collector.wage[1] / aIm;
-		double realCurrentPrice 		= (1 + Parameters.getFixedMarkUp_kFirms()) * collector.wage[1] / (productivity[0] * Parameters.getA_kFirms()) + 
-											Parameters.getMachinePaybackPeriod_cFirms() * collector.wage[1] / machineProduced.getA()[0];
+		double realCurrentPrice 		= (1 + Parameters.getFixedMarkUp_kFirms()) * collector.wage[1] / (firmProductivity[0] * Parameters.getA_kFirms()) + 
+											Parameters.getMachinePaybackPeriod_cFirms() * collector.wage[1] / machineProduced.getMachineProductivity()[0];
 		
 		// Choose the machine with the lowest "real price"
 		if( realPriceIm < realCurrentPrice ){
-			this.machineProduced.setA(new double[]{machineProduced.getA()[0], aIm});
-			this.productivity[1] 				= bIm;
+			this.machineProduced.setMachineProductivity(new double[]{machineProduced.getMachineProductivity()[0], aIm});
+			this.firmProductivity[1] 				= bIm;
 		}
 		
 		if( realPriceInn < realCurrentPrice ){
-			this.machineProduced.setA(new double[]{machineProduced.getA()[0], aInn});
-			this.productivity[1] 				= bInn;
+			this.machineProduced.setMachineProductivity(new double[]{machineProduced.getMachineProductivity()[0], aInn});
+			this.firmProductivity[1] 				= bInn;
 			// if the new machine is the result of an innovation, then it is considered as a new vintage 
 			this.machineProduced.setVintage(machineProduced.getVintage() + 1);			
 		} 
 		
 		// Update the machine's labor productivity 
-		if(machineProduced.getA()[1] > 0)
+		if(machineProduced.getMachineProductivity()[1] > 0)
 			// Equation (13.5) in Dosi et al. (2013)
-			machineProduced.setCost(collector.wage[1] / machineProduced.getA()[1]); 
+			machineProduced.setCost(collector.wage[1] / machineProduced.getMachineProductivity()[1]); 
 		else 
 			log.error("Machine's production <= 0");
 		
 		// Update the firm's cost of production
-		if(productivity[1] > 0){
+		if(firmProductivity[1] > 0){
 			// Equation (12) in Dosi et al. (2013)
-			this.costToProduceGood 						= collector.wage[1] / (Parameters.getA_kFirms() * productivity[1]); // eq. (12) in Dosi et al. (2013)
+			this.costToProduceGood 						= collector.wage[1] / (Parameters.getA_kFirms() * firmProductivity[1]); // eq. (12) in Dosi et al. (2013)
 		} else{
 			// This should not happen theoretically.
-			this.productivity[1] 				= 0.00001; 
+			this.firmProductivity[1] 				= 0.00001; 
 			log.error("KFirm's prod <= 0");
 		}
 		
@@ -372,7 +372,7 @@ public class KFirm extends Firm {
 													( Parameters.getX1upper_Innovation_kFirms() - Parameters.getX1lower_Innovation_kFirms() );
 			
 			// Equation (15.5) in Dosi et al. (2013)
-			this.aInn 							= machineProduced.getA()[0] * (1 + innovation);
+			this.aInn 							= machineProduced.getMachineProductivity()[0] * (1 + innovation);
 			
 			// Firm's productivity. Then scale the random variable s.t. it belongs to the appropriate support 
 			innovation 							= betaDistribution.sample();
@@ -380,7 +380,7 @@ public class KFirm extends Firm {
 													( Parameters.getX1upper_Innovation_kFirms() - Parameters.getX1lower_Innovation_kFirms() );
 			
 			// Equation (15.5) in Dosi et al. (2013)
-			this.bInn 							= productivity[0] * (1 + innovation);
+			this.bInn 							= firmProductivity[0] * (1 + innovation);
 		} 
 	}
 	
@@ -403,12 +403,12 @@ public class KFirm extends Firm {
 			
 			for(KFirm kFirm : model.getKFirms()){
 				
-				double prodOther 				= kFirm.productivity[0];
-				double prodMachineOther 		= kFirm.machineProduced.getA()[0];
+				double prodOther 				= kFirm.firmProductivity[0];
+				double prodMachineOther 		= kFirm.machineProduced.getMachineProductivity()[0];
 				// Compute the Euclidian distance 
-				double weight 					= Math.sqrt( (productivity[0] - prodOther) * (productivity[0] - prodOther) + 
-													(machineProduced.getA()[0] - prodMachineOther) * 
-													(machineProduced.getA()[0] - prodMachineOther) );
+				double weight 					= Math.sqrt( (firmProductivity[0] - prodOther) * (firmProductivity[0] - prodOther) + 
+													(machineProduced.getMachineProductivity()[0] - prodMachineOther) * 
+													(machineProduced.getMachineProductivity()[0] - prodMachineOther) );
 				// Inverse the Euclidian distance
 				if(weight > 0)
 					weight 						= 1 / weight;
@@ -422,8 +422,8 @@ public class KFirm extends Firm {
 			if(sum > 0){
 				EnumeratedDistribution<KFirm> kFirmDistribution = new EnumeratedDistribution<>((RandomGenerator) SimulationEngine.getRnd(), weightList);
 				KFirm firmSelected 				= kFirmDistribution.sample(); // pick randomly a firm from the list 
-				this.aIm 						= firmSelected.machineProduced.getA()[0];
-				this.bIm 						= firmSelected.productivity[0];
+				this.aIm 						= firmSelected.machineProduced.getMachineProductivity()[0];
+				this.bIm 						= firmSelected.firmProductivity[0];
 			} // else, there is absolutely no differences between firms. Firms cannot imitate.
 		}
 	}
@@ -491,8 +491,8 @@ public class KFirm extends Firm {
 		this.productionQuantity 									= this.demand[1];
 		
 		// Labor demand for the production of machines is added to the R&D labor demand
-		if(productivity[1] > 0)
-			this.laborDemandForProduction 				= productionQuantity / (productivity[1] * Parameters.getA_kFirms());
+		if(firmProductivity[1] > 0)
+			this.laborDemandForProduction 				= productionQuantity / (firmProductivity[1] * Parameters.getA_kFirms());
 		else {
 			log.fatal("ERROR: prod of KFirm < 0 when computing labor demand");
 		}
@@ -515,7 +515,7 @@ public class KFirm extends Firm {
 			
 			// Update production and labor demand with the labor ratio
 			this.productionQuantity 								= Math.floor(productionQuantity * ratio); 
-			this.laborDemandForProduction 				= productionQuantity / (productivity[1] * Parameters.getA_kFirms());
+			this.laborDemandForProduction 				= productionQuantity / (firmProductivity[1] * Parameters.getA_kFirms());
 			this.laborDemand 					= laborDemandForProduction + laborDemandForRd;
 			
 			// Compute the quantity sold when rounding down the rationed investments of each clients
@@ -680,8 +680,8 @@ public class KFirm extends Firm {
 		return machineProduced;
 	}
 	
-	public double getProdMachine(){
-		return machineProduced.getA()[1];
+	public double getMachineProductivity(){
+		return machineProduced.getMachineProductivity()[1];
 	}
 
 	public void setMachineProduced(Machine machineProduced) {
@@ -704,16 +704,16 @@ public class KFirm extends Firm {
 		return laborDemandForProduction;
 	}
 
-	public double[] getProductivity() {
-		return productivity;
+	public double[] getFirmProductivity() {
+		return firmProductivity;
 	}
 	
-	public double getProductivityNow() {
-		return productivity[1];
+	public double getFirmProductivityNow() {
+		return firmProductivity[1];
 	}
 
-	public void setProductivity(double[] productivity) {
-		this.productivity = productivity;
+	public void setFirmProductivity(double[] productivity) {
+		this.firmProductivity = productivity;
 	}
 
 	public PanelEntityKey getKey() {

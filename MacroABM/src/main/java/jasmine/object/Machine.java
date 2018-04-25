@@ -11,9 +11,9 @@ public class Machine implements Cloneable {
 	// ---------------------------------------------------------------------
 	
 	@Transient
-	double[] a; // price of the machine.  XXX: Is this really a price, or more like the productivity??? 
+	double[] machineProductivity; // price of the machine.  productivity of the machine.
 	@Transient
-	double cost; // cost of the machine 
+	double cost; // cost of the machine, "Unit labor cost of production entailed by [the] machine" (Dosi et al. 2013, eq. 13.5). 
 	@Transient
 	double vintage; // vintage of the machine, this increases in increments of 1 whenever the KFirm innovates and creates a more efficient machine.
 	@Transient
@@ -49,19 +49,19 @@ public class Machine implements Cloneable {
 	}
 	
 	public void update(){
-		this.a[0] 				= a[1];
+		this.machineProductivity[0] 				= machineProductivity[1];
 	}
 	
 	// ---------------------------------------------------------------------
 	// Getters / Setters 
 	// ---------------------------------------------------------------------
 
-	public double[] getA() {
-		return a;
+	public double[] getMachineProductivity() {
+		return machineProductivity;
 	}
 
-	public void setA(double[] a) {
-		this.a 				= a;
+	public void setMachineProductivity(double[] a) {
+		this.machineProductivity 				= a;
 	}
 
 	public double getCost() {

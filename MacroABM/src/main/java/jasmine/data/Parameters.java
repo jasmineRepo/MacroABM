@@ -104,8 +104,7 @@ public class Parameters {
 		x1lower_innovation_kFirms = - 0.15;
 		x1upper_innovation_kFirms = 0.15;
 		
-		a_kFirms = 0.1;
-		// a = 1;
+		a_kFirms = 0.1;	//1;
 		minPrice_kFirms = 0.01;
 		
 		// c-firms parameters
@@ -171,8 +170,7 @@ public class Parameters {
 		x1lower_innovation_kFirms = - 0.15;
 		x1upper_innovation_kFirms = 0.15;
 		
-		a_kFirms = 0.1;
-		// a = 1;
+		a_kFirms = 0.1;	//1;
 		minPrice_kFirms = 0.01;
 		
 		// c-firms parameters

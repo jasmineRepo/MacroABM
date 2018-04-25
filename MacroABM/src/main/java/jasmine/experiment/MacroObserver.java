@@ -263,11 +263,12 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			
 			if(gdpConsumptionInvestment) {
 			    //Create chart containing time-series' of log GDP, log consumption and log total investment
-				TimeSeriesSimulationPlotter logOutputConsumptionInvestment = new TimeSeriesSimulationPlotter("GDP, Consumption and Investment", "Log");
-				logOutputConsumptionInvestment.addSeries("Log GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogGDP));
-				logOutputConsumptionInvestment.addSeries("Log Consumption", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogConsumption));
-				logOutputConsumptionInvestment.addSeries("Log Investment", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalInvestment));
-				logOutputConsumptionInvestment.setName("GDP, Consumption and Investment");
+				TimeSeriesSimulationPlotter logOutputConsumptionInvestment = new TimeSeriesSimulationPlotter("GDP, Consumption, Investment", "Log");
+				logOutputConsumptionInvestment.addSeries("GDP", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogGDP));
+				logOutputConsumptionInvestment.addSeries("Consumption", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogConsumption));
+				logOutputConsumptionInvestment.addSeries("Investment", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalInvestment));
+//				logOutputConsumptionInvestment.addSeries("Aggregate Demand", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogAggregateDemand));
+				logOutputConsumptionInvestment.setName("GDP, Consumption, Investment");
 				updateChartSet.add(logOutputConsumptionInvestment);			//Add to set to be updated in buildSchedule method
 			    tabSet.add(logOutputConsumptionInvestment);
 	//			GuiUtils.addWindow(logOutputConsumptionInvestment, 0, 0, 300, 250);
@@ -296,8 +297,8 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			    if(creditActivity) {
 				    //Create chart containing time-series' of credit supply and demand
 					TimeSeriesSimulationPlotter bankMarket = new TimeSeriesSimulationPlotter("Credit Activity", "Log");
-					bankMarket.addSeries("Credit Supply (log)", (IDoubleSource) new MultiTraceFunction.Double(bank, Bank.Variables.LogCreditSupply));
-					bankMarket.addSeries("Credit Demand (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogCreditDemand));
+					bankMarket.addSeries("Credit Supply", (IDoubleSource) new MultiTraceFunction.Double(bank, Bank.Variables.LogCreditSupply));
+					bankMarket.addSeries("Credit Demand", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogCreditDemand));
 					bankMarket.setName("Credit activity");
 					updateChartSet.add(bankMarket);			//Add to set to be updated in buildSchedule method
 				    tabSet.add(bankMarket);
@@ -317,8 +318,8 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				    //Two charts under one tab, because data in charts have different scales
 	//			    Set<JInternalFrame> debtPlots = new LinkedHashSet<JInternalFrame>();
 					TimeSeriesSimulationPlotter debt = new TimeSeriesSimulationPlotter("Debt", "Log");
-					debt.addSeries("Debt (log)", (IDoubleSource) new MultiTraceFunction.Double(bank, Bank.Variables.LogDebt));
-					debt.addSeries("cFirm sector Bad debt (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogBadDebt));
+					debt.addSeries("Debt", (IDoubleSource) new MultiTraceFunction.Double(bank, Bank.Variables.LogDebt));
+					debt.addSeries("cFirm sector Bad debt", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogBadDebt));
 	//				debt.addSeries("Bank Bad debt (log)", (IDoubleSource) new MultiTraceFunction.Double(bank, Bank.Variables.LogBadDebt)); 
 					debt.setName("Debt");
 					updateChartSet.add(debt);			//Add to set to be updated in buildSchedule method
@@ -341,9 +342,9 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			    if(capitalStock) {
 					TimeSeriesSimulationPlotter capital = new TimeSeriesSimulationPlotter("Capital Stock of Consumption Firms", "Log");
 	//				capital.addSeries("", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.Empty));					//XXX: Ross: Not sure what Hugo was hoping to achieve here
-					capital.addSeries("Actual Stock (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogCapitalStock_cFirms));
-					capital.addSeries("Desired Stock (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDesiredCapitalStock_cFirms));
-					capital.addSeries("Top Limit of Stock (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogCapitalStockTopLimit));
+					capital.addSeries("Actual Stock", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogCapitalStock_cFirms));
+					capital.addSeries("Desired Stock", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDesiredCapitalStock_cFirms));
+					capital.addSeries("Top Limit of Stock", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogCapitalStockTopLimit));
 					capital.setName("Capital Stock");
 					updateChartSet.add(capital);			//Add to set to be updated in buildSchedule method
 				    tabSet.add(capital);
@@ -378,14 +379,14 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 		    if(investment) {
 			    Set<JInternalFrame> investmentPlots = new LinkedHashSet<JInternalFrame>();
 				TimeSeriesSimulationPlotter expansionaryInvestmentPlot = new TimeSeriesSimulationPlotter("Expansionary Investment", "Log");			//Was Capital Market
-				expansionaryInvestmentPlot.addSeries("Actual (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalExpansionaryInvestment_cFirms));
-				expansionaryInvestmentPlot.addSeries("Desired (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDesiredExpansionaryInvestmentTotal_cFirms));
-				expansionaryInvestmentPlot.addSeries("Desired star (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDesiredExpansionaryInvestmentTotalStar_cFirms));	//XXX: What does star mean???
+				expansionaryInvestmentPlot.addSeries("Actual", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalExpansionaryInvestment_cFirms));
+				expansionaryInvestmentPlot.addSeries("Desired", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDesiredExpansionaryInvestmentTotal_cFirms));
+				expansionaryInvestmentPlot.addSeries("Desired Star", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogDesiredExpansionaryInvestmentTotalStar_cFirms));	//XXX: What does star mean???
 	//				expansionaryInvestmentPlot.setName("Investment");
 				updateChartSet.add(expansionaryInvestmentPlot);			//Add to set to be updated in buildSchedule method
 			    investmentPlots.add(expansionaryInvestmentPlot);
 			    TimeSeriesSimulationPlotter substitionaryInvestmentPlot = new TimeSeriesSimulationPlotter("Substitionary Investment", "Log");	
-				substitionaryInvestmentPlot.addSeries("Substitionary investment (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalSubsitionaryInvestment_cFirms));
+				substitionaryInvestmentPlot.addSeries("Substitionary investment", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalSubsitionaryInvestment_cFirms));
 				updateChartSet.add(substitionaryInvestmentPlot);			//Add to set to be updated in buildSchedule method
 				investmentPlots.add(substitionaryInvestmentPlot);
 				tabSet.add(createScrollPaneFromPlots(investmentPlots, "Investment", investmentPlots.size()));
@@ -412,9 +413,9 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				
 			    if(consumptionGoodsMarket) {
 					TimeSeriesSimulationPlotter goodMarket = new TimeSeriesSimulationPlotter("Goods Market (Consumption Firms)", "Log");
-					goodMarket.addSeries("Production (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogProduction_cFirms));
-					goodMarket.addSeries("Consumption (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogConsumption));
-					goodMarket.addSeries("Total Desired Production (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalDesiredProduction_cFirms));
+					goodMarket.addSeries("Production", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogProduction_cFirms));
+					goodMarket.addSeries("Consumption", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogConsumption));
+					goodMarket.addSeries("Total Desired Production", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalDesiredProduction_cFirms));
 					goodMarket.setName("Consumption Goods Market");
 					updateChartSet.add(goodMarket);			//Add to set to be updated in buildSchedule method
 				    tabSet.add(goodMarket);					//Tab will be created for this chart
@@ -424,17 +425,17 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			    if(productivity) {
 				    //XXX: Ross - I don't understand the labelling of these time-series!!!  Need to check
 				    Set<JInternalFrame> productivityPlots = new LinkedHashSet<JInternalFrame>();
-				    TimeSeriesSimulationPlotter machineProd = new TimeSeriesSimulationPlotter("Machine Productivity (Capital Firms)", "Log"); 
+				    TimeSeriesSimulationPlotter machineProd = new TimeSeriesSimulationPlotter("Machine Productivity", "Log"); 
 					// rd.addSeries("R&D expenditures", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.RdExpenditures));
 	//				rdAll.addSeries("Avg Firm Productivity", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.MeanProductivityWeightedByMarketShare_kFirms));	//was labelled 'Mean K'.
-					machineProd.addSeries("Avg Machine Productivity (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogMeanMachineProductivityWeightedByMarketShare));	//was labelled 'Mean Machine'. 
-					machineProd.addSeries("Top Prod Labor (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTopProdLabor));		//was labelled 'Top Prod Labor'.  XXX: Not sure if this variable actually is related to Labor or to Machine productivity???
+					machineProd.addSeries("Avg Machine Productivity", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogMeanMachineProductivityWeightedByMarketShare));	//was labelled 'Mean Machine'. 
+					machineProd.addSeries("Top Machine Productivity", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTopMachineProductivity));		//was labelled 'Top Prod Labor', which is confusing as it appears to refer to machine productivity.
 	//				rdAll.addSeries("Top Machine Productivity", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.TopProdMachine));	//was labelled 'Top Prod Capital'.
 					updateChartSet.add(machineProd);			//Add to set to be updated in buildSchedule method
 					productivityPlots.add(machineProd); 							    			    			    
-				    TimeSeriesSimulationPlotter capitalProd = new TimeSeriesSimulationPlotter("Capital Firm Productivity", "Log");
-					capitalProd.addSeries("Avg Firm Productivity (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogMeanProductivityWeightedByMarketShare_kFirms));	//was labelled 'Mean K'.
-					capitalProd.addSeries("Top Machine Productivity (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTopProdMachine));	//was labelled 'Top Prod Capital'. 
+				    TimeSeriesSimulationPlotter capitalProd = new TimeSeriesSimulationPlotter("Capital Goods Firm Productivity", "Log");
+					capitalProd.addSeries("Avg Firm Productivity", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogMeanProductivityWeightedByMarketShare_kFirms));	//was labelled 'Mean K'.
+					capitalProd.addSeries("Top Firm Productivity", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTopProductivity_kFirms));	//was labelled 'Top Prod Capital'. 
 					updateChartSet.add(capitalProd);			//Add to set to be updated in buildSchedule method
 					productivityPlots.add(capitalProd);
 					tabSet.add(createScrollPaneFromPlots(productivityPlots, "Productivity", productivityPlots.size()));
@@ -443,8 +444,8 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			    if(profit) {
 					Set<JInternalFrame> profitPlots = new LinkedHashSet<JInternalFrame>();
 					TimeSeriesSimulationPlotter profit = new TimeSeriesSimulationPlotter("Profit: Consumption & Capital Goods Firms", "Log"); 
-					profit.addSeries("Consumption Firms sector (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogProfit_cFirms));
-					profit.addSeries("Capital Firms sector (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogProfit_kFirms));
+					profit.addSeries("Consumption Firms sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogProfit_cFirms));
+					profit.addSeries("Capital Firms sector", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogProfit_kFirms));
 					updateChartSet.add(profit);			//Add to set to be updated in buildSchedule method
 					profitPlots.add(profit);				
 					TimeSeriesSimulationPlotter capitalProfit = new TimeSeriesSimulationPlotter("Capital Goods Firm Profit", ""); 
@@ -511,7 +512,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 		    	if(laborMarket) {
 				    Set<JInternalFrame> laborMarketPlots = new LinkedHashSet<JInternalFrame>();			    
 				    TimeSeriesSimulationPlotter laborMarketWage = new TimeSeriesSimulationPlotter("Market Wage", "Log");
-					laborMarketWage.addSeries("Market Wage (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogWage));
+					laborMarketWage.addSeries("Market Wage", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogWage));
 					updateChartSet.add(laborMarketWage);			//Add to set to be updated in buildSchedule method
 					laborMarketPlots.add(laborMarketWage);
 				    TimeSeriesSimulationPlotter laborMarketUnemployment = new TimeSeriesSimulationPlotter("Unemployment Rate", "%");
@@ -553,7 +554,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				
 				if(assets) {
 					TimeSeriesSimulationPlotter asset = new TimeSeriesSimulationPlotter("Assets", "Log");
-					asset.addSeries("Capital Firms: Total Liquid Assets (log)", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalLiquidAssets_kFirms));
+					asset.addSeries("Capital Firms: Total Liquid Assets", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogTotalLiquidAssets_kFirms));
 					asset.setName("Assets");
 					updateChartSet.add(asset);			//Add to set to be updated in buildSchedule method
 				    tabSet.add(asset);					//Tab will be created for this chart

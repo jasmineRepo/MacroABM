@@ -378,17 +378,17 @@ public class CFirm extends Firm {
 	public void demandInitialization(){
 		
 		// The aggregate demand is shared uniformly across consumption-good firms since firms are ex-ante identical 
-		double dem 						= collector.aggregateDemand / ((double)model.getNumberOfCFirms()); 
+		double dem 						= collector.initialAggregateDemand / ((double)model.getNumberOfCFirms()); 
 		this.demand 					= new double[]{dem, dem}; 
 		this.productionQuantity							= dem;
 		// Initial inventories defined according to equation (19) in Dosi et al. (2013) 
-		this.inventories 							= new double[]{0, Parameters.getDesiredInventoriesProportionOfExpectedDemand_cFirms() * dem}; 
+		this.inventories 				= new double[]{0, Parameters.getDesiredInventoriesProportionOfExpectedDemand_cFirms() * dem}; 
 		this.stockFinalGood 			= productionQuantity + inventories[1]; 
 		
 		double sales0 					= dem * priceOfGoodProduced[1]; 
 		this.sales 						= new double[]{sales0, sales0}; 
 		// Gross operating surplus.
-		this.grossOperatingSurplus						= sales0 - costToProduceGood * productionQuantity;
+		this.grossOperatingSurplus		= sales0 - costToProduceGood * productionQuantity;
 		
 	}
 	
@@ -468,7 +468,7 @@ public class CFirm extends Firm {
 		this.capitalStock 									= 0;
 		for(Map.Entry<Machine, Integer> entry : machineQuantityMap.entrySet()){
 			// Update the unit labor cost of production, equation (13.5) in Dosi et al. (2013)
-			double newCost						= collector.wage[1] / entry.getKey().getA()[1];
+			double newCost						= collector.wage[1] / entry.getKey().getMachineProductivity()[1];
 			entry.getKey().setCost(newCost); 
 			// Equation (20.5) in Dosi et al. (2013)
 			this.capitalStock 								+= entry.getValue() * Parameters.getMachineSizeInCapital_cFirms(); 
@@ -482,7 +482,7 @@ public class CFirm extends Firm {
 		if(numberOfMachine > 0){
 			for(Map.Entry<Machine, Integer> entry : machineQuantityMap.entrySet()){
 				// Equation (21.5) in Dosi et al. (2013)
-				this.productivity 						+= entry.getKey().getA()[1] * entry.getValue() / numberOfMachine;
+				this.productivity 						+= entry.getKey().getMachineProductivity()[1] * entry.getValue() / numberOfMachine;
 			}
 		} else {
 			// This should not happen, at least under reasonable parametrization.
@@ -592,7 +592,7 @@ public class CFirm extends Firm {
 		Rank the machine according to their productivity (from the most to the least productive) */
 		Map<Machine, Double> productivitySet 	= new LinkedHashMap<>();
 		for(Map.Entry<Machine, Integer> entry : machineQuantityMap.entrySet()){
-			productivitySet.put(entry.getKey(), entry.getKey().getA()[1]);
+			productivitySet.put(entry.getKey(), entry.getKey().getMachineProductivity()[1]);
 		}
 		Map<Machine, Double> productivityRanked = MapSorting.sortByValueDescending(productivitySet);
 		
@@ -608,11 +608,11 @@ public class CFirm extends Firm {
 				Machine m 						= entry.getKey();
 				if(machineQuantityMap.get(m) > i){
 					// There are (marginally) enough machines of type m to meet the production target. Stop here
-					this.productivity 					+= m.getA()[1] * i / numberMachinesNeeded;
+					this.productivity 					+= m.getMachineProductivity()[1] * i / numberMachinesNeeded;
 					i 							= 0;
 				} else {
 					// Machines ranked lower than the machines of type m are also (marginally) needed
-					this.productivity 					+= m.getA()[1] * machineQuantityMap.get(m) / numberMachinesNeeded;
+					this.productivity 					+= m.getMachineProductivity()[1] * machineQuantityMap.get(m) / numberMachinesNeeded;
 					i 							-= machineQuantityMap.get(m);
 				}
 			} else {
@@ -669,10 +669,10 @@ public class CFirm extends Firm {
 			/* NOTE: requires the productivity of the current machine < the productivity of supplier's machine. Otherwise, 
 			 the payback would be negative, and because b (the payback parameter) is positive, the firm would actually want to scrap 
 			 this machine, even though its productivity is higher */
-			if(entry.getKey().getA()[1] < supplier.getMachineProduced().getA()[1] && collector.wage[1] > 0){
+			if(entry.getKey().getMachineProductivity()[1] < supplier.getMachineProduced().getMachineProductivity()[1] && collector.wage[1] > 0){
 				// Equation (21) in Dosi et al. (2013)
-				double payback 					= supplier.priceOfGoodProduced[1] / ( collector.wage[1] / entry.getKey().getA()[1] - 
-													collector.wage[1] / supplier.machineProduced.getA()[1] );
+				double payback 					= supplier.priceOfGoodProduced[1] / ( collector.wage[1] / entry.getKey().getMachineProductivity()[1] - 
+													collector.wage[1] / supplier.machineProduced.getMachineProductivity()[1] );
 
 				if(payback <= Parameters.getMachinePaybackPeriod_cFirms() && !machinesToBeScrappedMap.containsKey(entry.getKey()) ){
 					this.machinesToBeScrappedMap.put(entry.getKey(), entry.getValue());

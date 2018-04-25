@@ -83,7 +83,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	public double diffLogCPI;	//was diffLogCpi.
 	
 	// Goods market
-	public double aggregateDemand; 
+	public double initialAggregateDemand;
+	public double aggregateDemand;
 	public double[] consumption;
 	public double realConsumption;
 	public double pastConsumption; // consumption not met in t by CFirms that will come back in (t+1)
@@ -279,8 +280,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		
 		// Create all the cross sectional objects
 		
-		csProductivity_kFirms 						= new CrossSection.Double(model.getKFirms(), KFirm.class, "getProductivityNow", true);
-		csMachineProductivity 					= new CrossSection.Double(model.getKFirms(), KFirm.class, "getProdMachine", true);
+		csProductivity_kFirms 						= new CrossSection.Double(model.getKFirms(), KFirm.class, "getFirmProductivityNow", true);
+		csMachineProductivity 					= new CrossSection.Double(model.getKFirms(), KFirm.class, "getMachineProductivity", true);
 		csLaborDemand_cFirms				= new CrossSection.Double(model.getCFirms(), Firm.class, "getLaborDemand", true);
 		csLaborDemandForProduction_kFirms			= new CrossSection.Double(model.getKFirms(), KFirm.class, "getLaborDemandForProduction", true);
 		csLaborDemandForRd 				= new CrossSection.Double(model.getKFirms(), KFirm.class, "getLaborDemandForRd", true);
@@ -514,8 +515,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		ActualSubsitionaryInvestmentToGDPpercent_cFirms,
 
 		LaborDemand,
-		LogTopProdMachine,
-		LogTopProdLabor,
+		LogTopProductivity_kFirms,
+		LogTopMachineProductivity,
 		LaborRationingRatio,
 		LogBadDebt,
 		LogWage,
@@ -538,6 +539,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		ProductionNominalKFirmsToYproductionPercent,
 		ProductionNominalCFirmsToYproductionPercent,
 
+		LogAggregateDemand,
 
 	}
  	
@@ -710,11 +712,11 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	
 		case LaborDemand:
 			return this.laborDemand;
-		case LogTopProdLabor:			//XXX: Why is this called 'TopProdLabor', when it refers to the top machine productivity?
+		case LogTopMachineProductivity:			//Was called 'TopProdLabor', which is confusing as it appears to refer to the top machine productivity..
 			if(topMachineProductivity > 0)
 				return Math.log(this.topMachineProductivity);
 			else return Double.NaN;
-		case LogTopProdMachine:		//XXX: Why is this called 'TopProdMachine', when it refers to the productivity of the kFirms?  Wouldn't it be clearer to relabel the 'TopProdLabor' variable above with this name???
+		case LogTopProductivity_kFirms:		//Was called 'TopProdMachine', which is confusing as it appears to refer to the productivity of the kFirms...
 			if(topProductivity_kFirms > 0)
 				return Math.log(topProductivity_kFirms);
 			else return Double.NaN;
@@ -869,7 +871,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return 100. * productionNominalKFirmsToYproduction; 
 		case ProductionNominalCFirmsToYproductionPercent:
 			return 100. * productionNominalCFirmsToYproduction;
-
+		case LogAggregateDemand:
+			if(initialAggregateDemand > 0.)
+				return Math.log(initialAggregateDemand);
+			else return Double.NaN;
 			
 			
 			
@@ -931,7 +936,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		// The initial aggregate demand corresponds to the steady-state aggregate demand. The reasoning is presented in the code documentation 
 		KFirm aKFirm 				= model.getKFirms().get(0); 
 		CFirm aCFirm 				= model.getCFirms().get(0); 
-		this.aggregateDemand 		= ( ( wage[0] / ( aKFirm.getProductivity()[1] * Parameters.getA_kFirms() ) + Parameters.getFractionPastSalesInvestedInRandD_kFirms() * aKFirm.getPriceOfGoodProducedNow() ) * 
+		this.initialAggregateDemand 		= ( ( wage[0] / ( aKFirm.getFirmProductivity()[1] * Parameters.getA_kFirms() ) + Parameters.getFractionPastSalesInvestedInRandD_kFirms() * aKFirm.getPriceOfGoodProducedNow() ) * 
 										aCFirm.getInvestment() / Parameters.getMachineSizeInCapital_cFirms() * ((double) model.getNumberOfCFirms()) * (1 - model.getUnemploymentBenefitShare()) +
 										model.getUnemploymentBenefitShare() * wage[0] * MacroModel.getLabourSupply() ) / 
 										(aCFirm.getPriceOfGoodProducedNow() - ((1 - model.getUnemploymentBenefitShare()) * wage[0]) / aCFirm.getProductivity() ); 
@@ -978,24 +983,24 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		/* Update temporal variables, from (t) to (t-1), and set variables that are incrementally calculated to 0. 
 		NOTE: the wage is updated at the end of the period, because it requires information from the current period.  */
 		this.averageLaborProductivity[0] 		= averageLaborProductivity[1];
-		this.meanCompetitiveness_cFirms[0] 				= meanCompetitiveness_cFirms[1];
-		this.cpi[0] 					= cpi[1];
-		this.ppi[0] 					= ppi[1];
-		this.unemploymentRate[0] 					= unemploymentRate[1];
-		this.totalMarketShare_cFirms[0] 					= totalMarketShare_cFirms[1];
-		this.totalMarketShare_cFirms[1] 					= totalMarketShare_cFirms[2];
-		this.gdp[0] 					= gdp[1];
-		this.investmentTotal_cFirms[0] 				= investmentTotal_cFirms[1];
-		this.consumption[0] 			= consumption[1];
+		this.meanCompetitiveness_cFirms[0]		= meanCompetitiveness_cFirms[1];
+		this.cpi[0] 							= cpi[1];
+		this.ppi[0] 							= ppi[1];
+		this.unemploymentRate[0] 				= unemploymentRate[1];
+		this.totalMarketShare_cFirms[0] 		= totalMarketShare_cFirms[1];
+		this.totalMarketShare_cFirms[1] 		= totalMarketShare_cFirms[2];
+		this.gdp[0] 							= gdp[1];
+		this.investmentTotal_cFirms[0] 			= investmentTotal_cFirms[1];
+		this.consumption[0] 					= consumption[1];
 		
-		this.laborDemandUsedForProduction 			= 0;
+		this.laborDemandUsedForProduction 		= 0;
 		this.laborDemandForRandD 				= 0;
-		this.diffTotalInventories_cFirms 						= 0;
-		this.govRevenues 				= 0;
-		this.govSpending 				= 0;
+		this.diffTotalInventories_cFirms 		= 0;
+		this.govRevenues 						= 0;
+		this.govSpending 						= 0;
 		this.creditRationingRate_cFirms 		= 0;
 		
-//		this.flag						= 0;
+//		this.flag								= 0;
 		
 	}
 	
@@ -1090,9 +1095,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		
 		// Compute aggregate consumption
 		// Add the past consumption non-matched by the consumption-good firms' production to the current aggregate consumption
-		this.consumption[1] 			= laborDemand * wage[1] + govSpending + pastConsumption * (1 + model.getInterestRate());
-//		this.consumption[1] 			= laborDemand * wage[1] + govSpending;
+//		consumption[1]					= demand;
+		this.consumption[1] 			= laborDemand * wage[1] + govSpending + pastConsumption * (1 + model.getInterestRate());	//Hugo's original equation
 		aggConsumption					= laborDemand * wage[1] + unemployment * wage[1] * model.getUnemploymentBenefitShare();		//This is the equation in Dosi et al. (2013) page 1754, so why do we need to add on the extra term featuring pastConsumption above???
+//		aggConsumption					= consumption[1];
 		
 		log.fatal("Consumption variables: " + 
 					"\n Gov. spending " + govSpending + 
@@ -1241,16 +1247,16 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		for(KFirm kFirm : model.getKFirms()){
 			if(production_kFirms > 0){
 				productionNominal_kFirms 		+= kFirm.getProductionQuantity() * kFirm.getPriceOfGoodProducedNow();
-				this.meanProductivityWeightedByMarketShare_kFirms += kFirm.getProductivity()[1] * kFirm.getMarketShare()[2];
-				this.meanMachineProductivityWeightedByMarketShare += kFirm.getMachineProduced().getA()[1] * kFirm.getMarketShare()[2];
+				this.meanProductivityWeightedByMarketShare_kFirms += kFirm.getFirmProductivity()[1] * kFirm.getMarketShare()[2];
+				this.meanMachineProductivityWeightedByMarketShare += kFirm.getMachineProduced().getMachineProductivity()[1] * kFirm.getMarketShare()[2];
 			} else {
-				this.meanProductivityWeightedByMarketShare_kFirms += kFirm.getProductivity()[1];
-				this.meanMachineProductivityWeightedByMarketShare += kFirm.getMachineProduced().getA()[1];
+				this.meanProductivityWeightedByMarketShare_kFirms += kFirm.getFirmProductivity()[1];
+				this.meanMachineProductivityWeightedByMarketShare += kFirm.getMachineProduced().getMachineProductivity()[1];
 			}
-			this.meanLogProductivity_kFirms 			+= Math.log(kFirm.getProductivity()[1]);
+			this.meanLogProductivity_kFirms 			+= Math.log(kFirm.getFirmProductivity()[1]);
 			this.herfindahlMeasure_kFirms 				+= kFirm.getMarketShare()[2] * kFirm.getMarketShare()[2];
 			// The average labor productivity takes also into account the capital good firms' productivity
-			this.averageLaborProductivity[1] 	+= kFirm.getProductivity()[1] * kFirm.getLaborDemandForProduction() / laborDemandUsedForProduction;
+			this.averageLaborProductivity[1] 	+= kFirm.getFirmProductivity()[1] * kFirm.getLaborDemandForProduction() / laborDemandUsedForProduction;
 			
 			if(kFirm.getClients().size() > maxClientsPerFirm_kFirms)
 				this.maxClientsPerFirm_kFirms 			= kFirm.getClients().size();
@@ -1387,6 +1393,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		investmentToYcin = investmentTotal_cFirms[1] / Ycin;
 		changeInInventoriesValueToYcin = diffTotalInventoriesNominal_cFirms / Ycin;
 		
+
 		
 	}
 	
