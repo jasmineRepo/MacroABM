@@ -75,6 +75,8 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 	//Boolean GUI parameter toggles to switch a particular chart on / off
 	
 	@GUIparameter(description = "Toggle to turn chart on / off")
+	private boolean acountingIdentities = true;
+	@GUIparameter(description = "Toggle to turn chart on / off")
 	private boolean consumptionComponents = false;
 	@GUIparameter(description = "Toggle to turn chart on / off")
 	private boolean gdpComponents = false;
@@ -145,6 +147,34 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			updateChartSet = new LinkedHashSet<JInternalFrame>();	//Set of all charts needed to be scheduled for updating
 			tabSet = new LinkedHashSet<JComponent>();		//Set of all JInternalFrames each having a tab.  Each tab frame will potentially contain more than one chart each.
 
+			if(acountingIdentities) {
+				
+				Set<JInternalFrame> accountingIdentitiesPlots = new LinkedHashSet<JInternalFrame>();
+			    TimeSeriesSimulationPlotter yPlot = new TimeSeriesSimulationPlotter("Y comparison", "Log"); 
+				yPlot.addSeries("Y = C + I + N", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogYcin));
+				yPlot.addSeries("Y = Sum of production values", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogYproduction));
+				updateChartSet.add(yPlot);			//Add to set to be updated in buildSchedule method
+				accountingIdentitiesPlots.add(yPlot); 							    			    			    
+			    TimeSeriesSimulationPlotter yComparisonPlot = new TimeSeriesSimulationPlotter("Ycin / Yproduction", ""); 
+				yComparisonPlot.addSeries("Ycin / Yproduction", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.YcinToYproduction));
+				updateChartSet.add(yComparisonPlot);			//Add to set to be updated in buildSchedule method
+				accountingIdentitiesPlots.add(yComparisonPlot); 							    			    			    
+				TimeSeriesSimulationPlotter yCINcomponentsPlot = new TimeSeriesSimulationPlotter("Components of Ycin", "%"); 
+				yCINcomponentsPlot.addSeries("Consumption / Ycin", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionToYcinPercent));
+				yCINcomponentsPlot.addSeries("Investment / Ycin", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InvestmentToYcinPercent));
+				yCINcomponentsPlot.addSeries("Change in Inventories Values / Ycin", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ChangeInInventoriesValueToYcinPercent));
+				updateChartSet.add(yCINcomponentsPlot);			//Add to set to be updated in buildSchedule method
+				accountingIdentitiesPlots.add(yCINcomponentsPlot);
+				TimeSeriesSimulationPlotter yProductioncomponentsPlot = new TimeSeriesSimulationPlotter("Components of Yproduction", "%"); 
+				yProductioncomponentsPlot.addSeries("kFirms production / Yproduction", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProductionNominalKFirmsToYproductionPercent));
+				yProductioncomponentsPlot.addSeries("cFirms production / Yproduction", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProductionNominalCFirmsToYproductionPercent));
+				updateChartSet.add(yProductioncomponentsPlot);			//Add to set to be updated in buildSchedule method
+				accountingIdentitiesPlots.add(yProductioncomponentsPlot); 							    			 
+				tabSet.add(createScrollPaneFromPlots(accountingIdentitiesPlots, "Consumption Components", accountingIdentitiesPlots.size()));
+				
+			}
+			
+			
 
 			if(consumptionComponents) {
 				//CHECKS
@@ -468,6 +498,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 				government.addSeries("Balance (revenues - spending) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovBalanceToGDPpercent));
 				government.addSeries("Stock (accumulated Balance over time) to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovStockToGDPpercent));
 				government.addSeries("Spending to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovSpendingToGDPpercent));
+				government.addSeries("Revenues to GDP ratio", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GovRevenuesToGDPpercent));
 				government.setName("Government Ratios");
 				updateChartSet.add(government);			//Add to set to be updated in buildSchedule method
 			    tabSet.add(government);					//Tab will be created for this chart
@@ -963,6 +994,14 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 
 	public void setInflation(boolean inflation) {
 		this.inflation = inflation;
+	}
+
+	public boolean isAcountingIdentities() {
+		return acountingIdentities;
+	}
+
+	public void setAcountingIdentities(boolean acountingIdentities) {
+		this.acountingIdentities = acountingIdentities;
 	}
 
 }

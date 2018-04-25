@@ -125,7 +125,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	public double gdpGrowth; 
 	public double totalFactorProductivity; // total factor productivity, was tfp. 
 	public double totalInventories; // total inventories, was nTot; TODO: can remove
-	public double diffTotalInventories; // difference in inventories, was diffN. 
+	public double diffTotalInventories_cFirms; // difference in inventories, was diffN. 
 	public double diffTotalInventoriesNominal; // difference in inventories, nominal, was diffNNom.
 	
 	// C-firms
@@ -221,10 +221,26 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	public double govBalanceToGdp; // ratio of the gov's deficit to gdp, was govDefGdp
 	public double govStockToGdp; //ratio of the gov's debt to gdp, was govDebtGdp
 	public double govSpendingToGdp; // ratio of the gov's spending to gdp, was govSpendingGdp
+	public double govRevenuesToGdp;
 	
 	MacroModel model;
 
+	//ROSS: New variables to double check accounting identities	
 	private double aggConsumption;
+
+	private double Ycin;
+
+	private double Yproduction;
+
+	private double consumptionToYcin;
+
+	private double investmentToYcin;
+
+	private double changeInInventoriesValueToYcin;
+
+	private double productionNominalKFirmsToYproduction;
+
+	private double productionNominalCFirmsToYproduction;
 
 //	private MeanVarianceArrayFunction fMeanVarianceLiquidityToSalesRatio_cFirms;
 	
@@ -448,6 +464,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		GovBalanceToGDPpercent,
 		GovStockToGDPpercent,
 		GovSpendingToGDPpercent,
+		GovRevenuesToGDPpercent,
 		LogGovSpending,
 		LogCreditDemand, 
 		LogMeanProductivityWeightedByMarketShare_kFirms,
@@ -510,6 +527,17 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		ExitPercentLiquidityIssue_cFirms,
 		ExitPercentMarketShareIssue_cFirms,
 		ExitPercentAssetMarket_cFirms,
+		
+		//ROSS: New variables to double check accounting identities investigating equation 11 of Dosi et al. (2013)
+		LogYcin,
+		LogYproduction,
+		YcinToYproduction,
+		ConsumptionToYcinPercent,
+		InvestmentToYcinPercent,
+		ChangeInInventoriesValueToYcinPercent,
+		ProductionNominalKFirmsToYproductionPercent,
+		ProductionNominalCFirmsToYproductionPercent,
+
 
 	}
  	
@@ -539,8 +567,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 				return Math.log(diffTotalInventoriesNominal);
 			else return Double.NaN;
 		case LogDiffInventories_cFirms:
-			if(diffTotalInventories > 0.)
-				return Math.log(diffTotalInventories);
+			if(diffTotalInventories_cFirms > 0.)
+				return Math.log(diffTotalInventories_cFirms);
 			else return Double.NaN;			
 			
 		case TotalMarkUp_cFirms:
@@ -588,7 +616,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			else return Double.NaN;
 			
 		case LogConsumption:
-			if(consumption[1] > 0.)
+			if(aggConsumption > 0.)
 //				return Math.log(this.consumption[1]);
 				return Math.log(this.aggConsumption);
 			else 
@@ -775,6 +803,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return 100. * govStockToGdp;
 		case GovSpendingToGDPpercent:
 			return 100. * govSpendingToGdp;
+		case GovRevenuesToGDPpercent:
+			return 100. * govRevenuesToGdp;
 		case LogGovSpending:
 			if(govSpending > 0.)
 				return Math.log(govSpending);
@@ -816,6 +846,32 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		case ExitPercentAssetMarket_cFirms:
 			return 100. * exitAssetMarket_cFirms / (double)model.getCFirms().size();
 
+			
+		case LogYcin:
+			if(Ycin > 0.)
+				return Math.log(Ycin);
+			else return Double.NaN;
+		case LogYproduction:
+			if(Yproduction > 0.)
+				return Math.log(Yproduction);
+			else return Double.NaN;
+		case YcinToYproduction:
+			if(Yproduction > 0.)
+				return Ycin / Yproduction;
+			else return Double.NaN;
+		case ConsumptionToYcinPercent:
+			return 100. * consumptionToYcin;
+		case InvestmentToYcinPercent:
+			return 100. * investmentToYcin;
+		case ChangeInInventoriesValueToYcinPercent:
+			return 100. * changeInInventoriesValueToYcin;
+		case ProductionNominalKFirmsToYproductionPercent:
+			return 100. * productionNominalKFirmsToYproduction; 
+		case ProductionNominalCFirmsToYproductionPercent:
+			return 100. * productionNominalCFirmsToYproduction;
+
+			
+			
 			
 		default: 
 			throw new IllegalArgumentException("Unsupported variable"); 
@@ -891,7 +947,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		
 		this.consumption 			= new double[]{0, 0};
 		this.pastConsumption 		= 0;
-		this.diffTotalInventories 					= 0;
+		this.diffTotalInventories_cFirms 					= 0;
 		
 		// Recall: [0] = t-2, [1] = t-1, [0] = t????????
 		this.totalMarketShare_cFirms 					= new double[]{0., 0., 0.}; 
@@ -934,10 +990,9 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		
 		this.laborDemandUsedForProduction 			= 0;
 		this.laborDemandForRandD 				= 0;
-		this.diffTotalInventories 						= 0;
+		this.diffTotalInventories_cFirms 						= 0;
 		this.govRevenues 				= 0;
 		this.govSpending 				= 0;
-//		this.diffTotalInventories 						= 0;
 		this.creditRationingRate_cFirms 		= 0;
 		
 //		this.flag						= 0;
@@ -1037,7 +1092,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		// Add the past consumption non-matched by the consumption-good firms' production to the current aggregate consumption
 		this.consumption[1] 			= laborDemand * wage[1] + govSpending + pastConsumption * (1 + model.getInterestRate());
 //		this.consumption[1] 			= laborDemand * wage[1] + govSpending;
-		aggConsumption					= laborDemand * wage[1] + govSpending; 			//This is the equation in Dosi et al. (2013) page 1754, so why do we need to add on the extra term featuring pastConsumption above???
+		aggConsumption					= laborDemand * wage[1] + unemployment * wage[1] * model.getUnemploymentBenefitShare();		//This is the equation in Dosi et al. (2013) page 1754, so why do we need to add on the extra term featuring pastConsumption above???
 		
 		log.fatal("Consumption variables: " + 
 					"\n Gov. spending " + govSpending + 
@@ -1215,9 +1270,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		// Production
 		this.output 					= realConsumption + production_kFirms;
 		// GDP; equation (11) in Dosi et al. (2013)
-		this.gdp[1] 					= realConsumption + production_kFirms + diffTotalInventories;
-		this.gdpNominal 					= productionNominal_kFirms + productionNominal_cFirms + diffTotalInventoriesNominal;
+		this.gdp[1] 					= realConsumption + production_kFirms + diffTotalInventories_cFirms;
+		this.gdpNominal					= productionNominal_kFirms + productionNominal_cFirms + diffTotalInventoriesNominal;
 		this.gdpLog 					= Math.log(gdp[1]);
+				
 		// GDP growth
 		if(SimulationEngine.getInstance().getTime() > 0)
 			this.gdpGrowth 				= Math.log(gdp[1]) - Math.log(gdp[0]);
@@ -1239,6 +1295,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		this.govBalanceToGdp 			= govBalance / gdpNominal;
 		this.govStockToGdp 				= govStock / gdpNominal;
 		this.govSpendingToGdp 			= govSpending / gdpNominal;
+		this.govRevenuesToGdp			= govRevenues / gdpNominal;
 		
 		// WAGE
 		this.wage[0] 					= wage[1];
@@ -1315,6 +1372,21 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		this.avgAgeMachines_cFirms 				/= model.getNumberOfCFirms();
 		this.desiredExpansionaryInvestmentTotal_cFirms 				/= Parameters.getMachineSizeInCapital_cFirms();
 		this.desiredExpansionaryInvestmentTotalStar_cFirms 			/= Parameters.getMachineSizeInCapital_cFirms();
+		
+		
+		//Ross:  New variables to establish accounting identities
+		
+		//Production view of (nominal) GDP: I assume the equations in Dosi et al. (eq 11 in 2010 and just under eq 15 in 2013) are incorrect, in that production Q is not weighted by the cost of production.  In our case, we do weigh by costs to get monetary values.
+		Yproduction = productionNominal_kFirms + productionNominal_cFirms;
+		productionNominalKFirmsToYproduction = productionNominal_kFirms / Yproduction;
+		productionNominalCFirmsToYproduction = productionNominal_cFirms / Yproduction;
+				
+		//Expenditure view of (nominal) GDP
+		Ycin		= aggConsumption + investmentTotal_cFirms[1] + diffTotalInventoriesNominal;
+		consumptionToYcin = aggConsumption / Ycin;
+		investmentToYcin = investmentTotal_cFirms[1] / Ycin;
+		changeInInventoriesValueToYcin = diffTotalInventoriesNominal / Ycin;
+		
 		
 	}
 	

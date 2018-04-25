@@ -1664,7 +1664,7 @@ public class CFirm extends Firm {
 		this.profit 							= grossOperatingSurplus + depositRevenue - debtInterest;
 		this.inventories[1] 					= Math.max(0, stockFinalGood);
 		double diffN 							= inventories[1] - inventories[0];
-		collector.diffTotalInventories 			+= diffN;
+		collector.diffTotalInventories_cFirms 			+= diffN;
 		
 		double debtRepaid 						= Parameters.getDebtRepaymentSharePerPeriod_cFirms() * debt[1];
 		
