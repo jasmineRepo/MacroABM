@@ -126,7 +126,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	public double totalFactorProductivity; // total factor productivity, was tfp. 
 	public double totalInventories; // total inventories, was nTot; TODO: can remove
 	public double diffTotalInventories_cFirms; // difference in inventories, was diffN. 
-	public double diffTotalInventoriesNominal; // difference in inventories, nominal, was diffNNom.
+	public double diffTotalInventoriesNominal_cFirms; // difference in inventories, nominal, was diffNNom.
 	
 	// C-firms
 	public double[] meanCompetitiveness_cFirms; // mean competitiveness in consummption-sector, was meanComp. 
@@ -561,10 +561,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		case TotalInventories:
 			return this.totalInventories;
 		case DiffTotalInventoriesToGDPpercent:
-			return 100. * diffTotalInventoriesNominal / gdpNominal;
+			return 100. * diffTotalInventoriesNominal_cFirms / gdpNominal;
 		case LogDiffInventoriesNominal_cFirms:
-			if(diffTotalInventoriesNominal > 0.)
-				return Math.log(diffTotalInventoriesNominal);
+			if(diffTotalInventoriesNominal_cFirms > 0.)
+				return Math.log(diffTotalInventoriesNominal_cFirms);
 			else return Double.NaN;
 		case LogDiffInventories_cFirms:
 			if(diffTotalInventories_cFirms > 0.)
@@ -607,7 +607,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			
 		case ChangeInInventoriesPlusConsumptionPlusFirmAndBankProfitsToGDPpercent:
 			if(gdp[1] > 0.)
-				return 100. * (diffTotalInventoriesNominal + aggConsumption + profit_cFirms + profit_kFirms + model.getBank().profit) / gdpNominal;
+				return 100. * (diffTotalInventoriesNominal_cFirms + aggConsumption + profit_cFirms + profit_kFirms + model.getBank().profit) / gdpNominal;
 			else return Double.NaN;
 			
 		case WagesPlusUnemploymentBenefitsToGDPpercent:
@@ -1190,7 +1190,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		this.meanProductivityWeightedByMarketShare_cFirms 		= 0; // mean prod. with weight = market share
 		this.meanLogProductivity_cFirms 				= 0; // mean prod. in log
 		this.productionNominal_cFirms 			= 0; // nominal total production
-		this.diffTotalInventoriesNominal 					= 0; // nominal total variation of inventories 
+		this.diffTotalInventoriesNominal_cFirms 					= 0; // nominal total variation of inventories 
 		this.averageLaborProductivity[1] 		= 0; // measure of productivity taken into account in the wage equation
 		this.herfindahlMeasure_cFirms 						= 0; // Herfindahl measure 
 		this.meanCostWeightedByMarketShare_cFirms 				= 0; // mean cost, with weight = market share
@@ -1202,7 +1202,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			this.meanProductivityWeightedByMarketShare_cFirms 	+= cFirm.getProductivity() * cFirm.getMarketShare()[2];
 			this.meanLogProductivity_cFirms 			+= Math.log(cFirm.getProductivity());
 			this.productionNominal_cFirms 		+= cFirm.getProductionQuantity() * cFirm.getPriceOfGoodProducedNow();
-			this.diffTotalInventoriesNominal 				+= cFirm.getInventories()[1] * cFirm.getPriceOfGoodProducedNow() - cFirm.getInventories()[0] * cFirm.getPriceOfGoodProducedPrevious();
+			this.diffTotalInventoriesNominal_cFirms 				+= cFirm.getInventories()[1] * cFirm.getPriceOfGoodProducedNow() - cFirm.getInventories()[0] * cFirm.getPriceOfGoodProducedPrevious();
 			this.averageLaborProductivity[1] 	+= cFirm.getLaborDemand() * cFirm.getProductivity() / laborDemandUsedForProduction;
 			this.herfindahlMeasure_cFirms 					+= cFirm.getMarketShare()[2] * cFirm.getMarketShare()[2];
 			this.meanCostWeightedByMarketShare_cFirms 			+= cFirm.getCostToProduceGood() * cFirm.getMarketShare()[2];
@@ -1271,7 +1271,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		this.output 					= realConsumption + production_kFirms;
 		// GDP; equation (11) in Dosi et al. (2013)
 		this.gdp[1] 					= realConsumption + production_kFirms + diffTotalInventories_cFirms;
-		this.gdpNominal					= productionNominal_kFirms + productionNominal_cFirms + diffTotalInventoriesNominal;
+		this.gdpNominal					= productionNominal_kFirms + productionNominal_cFirms + diffTotalInventoriesNominal_cFirms;
 		this.gdpLog 					= Math.log(gdp[1]);
 				
 		// GDP growth
@@ -1382,10 +1382,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		productionNominalCFirmsToYproduction = productionNominal_cFirms / Yproduction;
 				
 		//Expenditure view of (nominal) GDP
-		Ycin		= aggConsumption + investmentTotal_cFirms[1] + diffTotalInventoriesNominal;
+		Ycin		= aggConsumption + investmentTotal_cFirms[1] + diffTotalInventoriesNominal_cFirms;
 		consumptionToYcin = aggConsumption / Ycin;
 		investmentToYcin = investmentTotal_cFirms[1] / Ycin;
-		changeInInventoriesValueToYcin = diffTotalInventoriesNominal / Ycin;
+		changeInInventoriesValueToYcin = diffTotalInventoriesNominal_cFirms / Ycin;
 		
 		
 	}
