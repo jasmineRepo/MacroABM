@@ -380,7 +380,7 @@ public class CFirm extends Firm {
 		// The aggregate demand is shared uniformly across consumption-good firms since firms are ex-ante identical 
 		double dem 						= collector.initialAggregateDemand / ((double)model.getNumberOfCFirms()); 
 		this.demand 					= new double[]{dem, dem}; 
-		this.productionQuantity							= dem;
+		this.productionQuantity			= dem;
 		// Initial inventories defined according to equation (19) in Dosi et al. (2013) 
 		this.inventories 				= new double[]{0, Parameters.getDesiredInventoriesProportionOfExpectedDemand_cFirms() * dem}; 
 		this.stockFinalGood 			= productionQuantity + inventories[1]; 
@@ -2086,6 +2086,10 @@ public class CFirm extends Firm {
 
 	public PanelEntityKey getKey() {
 		return key;
+	}
+
+	public double getGrossOperatingSurplus() {
+		return grossOperatingSurplus;
 	}
 
 }

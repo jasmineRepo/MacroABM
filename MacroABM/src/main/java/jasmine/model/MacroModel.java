@@ -639,7 +639,7 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 			fTotTemp 						+= cFirm.marketShare[2];
 		}
 		 
-		this.consumptionTemp 				= 0; 
+//		this.consumptionTemp 				= 0; 
 		
 		// Temporary variable used to specify if it is the first round of the allocation process
 		int i 								= 1;

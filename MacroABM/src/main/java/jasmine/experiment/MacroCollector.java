@@ -87,7 +87,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	public double aggregateDemand;
 	public double[] consumption;
 	public double realConsumption;
-	public double pastConsumption; // consumption not met in t by CFirms that will come back in (t+1)
+	public double pastConsumption; // consumption (demand) not able to be fulfilled in t by CFirms that will come back in (t+1)
 	// the two following variables are mainly used for the computation of the c-firms' competitiveness and market share 
 	public double[] cpi; // consumer price index (price of cFirms)
 	
@@ -180,6 +180,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	public CrossSection.Double csProfit_cFirms;	//was csProfitCons
 	public SumArrayFunction fSumProfit_cFirms;		//was fSumProfitCons
 	
+	public double grossOperatingSurplus_cFirms;
+	public CrossSection.Double csGrossOperatingSurplus_cFirms;	//was csProfitCons
+	public SumArrayFunction fSumGrossOperatingSurplus_cFirms;		//was fSumProfitCons
+	
 	// K-firms
 	public int exit_kFirms; // exit in the K-sector, was exit1
 	public double herfindahlMeasure_kFirms; // Herfindahl measure for capital sector, was hCapital
@@ -243,6 +247,24 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 
 	private double productionNominalCFirmsToYproduction;
 
+	private double grossInvestment;
+
+	private double gdpEx;
+
+	private double consumptionToGDPex;
+
+	private double investmentToGDPex;
+
+	private double gdpInc;
+
+	private double wagesToGDPinc;
+
+	private double profitsToGDPinc;
+
+	private double interestToGDPinc;
+	
+	private double depreciationToGDPinc;
+
 //	private MeanVarianceArrayFunction fMeanVarianceLiquidityToSalesRatio_cFirms;
 	
 	
@@ -295,6 +317,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		csInvestmentSubstitutionary 						= new CrossSection.Double(model.getCFirms(), CFirm.class, "getInvestmentSubstitutionary", true);
 		csDemand_cFirms 					= new CrossSection.Double(model.getCFirms(), Firm.class, "getDemandNow", true);
 		csProfit_cFirms 					= new CrossSection.Double(model.getCFirms(), Firm.class, "getProfit", true);
+		csGrossOperatingSurplus_cFirms 					= new CrossSection.Double(model.getCFirms(), CFirm.class, "getGrossOperatingSurplus", true);
 		csProfit_kFirms 				= new CrossSection.Double(model.getKFirms(), Firm.class, "getProfit", true);
 		csLiquidAsset_kFirms 			= new CrossSection.Double(model.getKFirms(), Firm.class, "getLiquidAssetNow", true);
 		csLiquidAssets_cFirms 				= new CrossSection.Double(model.getCFirms(), Firm.class, "getLiquidAssetNow", true);
@@ -319,20 +342,21 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		fMeanLiquidityToSalesRatio_cFirms				= new MeanArrayFunction(csLiquidityToSalesRatio_cFirms);
 //		fMeanVarianceLiquidityToSalesRatio_cFirms		= new MeanVarianceArrayFunction(csLiquidityToSalesRatio_cFirms);
 		
-		fSumLaborDemand_cFirms 			= new SumArrayFunction.Double(csLaborDemand_cFirms);
-		fSumLaborDemandForProduction_kFirms 			= new SumArrayFunction.Double(csLaborDemandForProduction_kFirms);
+		fSumLaborDemand_cFirms 				= new SumArrayFunction.Double(csLaborDemand_cFirms);
+		fSumLaborDemandForProduction_kFirms = new SumArrayFunction.Double(csLaborDemandForProduction_kFirms);
 		fSumLaborDemandForRd 				= new SumArrayFunction.Double(csLaborDemandForRd);
-		fSumTotalProduction_cFirms 				= new SumArrayFunction.Double(csTotalProduction_cFirms);
+		fSumTotalProduction_cFirms 			= new SumArrayFunction.Double(csTotalProduction_cFirms);
 		fSumTotalProduction_kFirms 			= new SumArrayFunction.Double(csTotalProduction_kFirms);
-		fSumInvestmentExpansionary 						= new SumArrayFunction.Double(csInvestmentExpansionary);
-		fSumInvestmentSubstitutionary 						= new SumArrayFunction.Double(csInvestmentSubstitutionary);
+		fSumInvestmentExpansionary 			= new SumArrayFunction.Double(csInvestmentExpansionary);
+		fSumInvestmentSubstitutionary 		= new SumArrayFunction.Double(csInvestmentSubstitutionary);
 		fSumDemand_cFirms 					= new SumArrayFunction.Double(csDemand_cFirms);
 		fSumProfit_cFirms 					= new SumArrayFunction.Double(csProfit_cFirms);
-		fSumProfit_kFirms 				= new SumArrayFunction.Double(csProfit_kFirms);
-		fSumLiquidAsset_kFirms 			= new SumArrayFunction.Double(csLiquidAsset_kFirms);
+		fSumGrossOperatingSurplus_cFirms	= new SumArrayFunction.Double(csGrossOperatingSurplus_cFirms);
+		fSumProfit_kFirms 					= new SumArrayFunction.Double(csProfit_kFirms);
+		fSumLiquidAsset_kFirms 				= new SumArrayFunction.Double(csLiquidAsset_kFirms);
 		fSumLiquidAssets_cFirms 			= new SumArrayFunction.Double(csLiquidAssets_cFirms);
-		fSumRdExpenditures_kFirms 				= new SumArrayFunction.Double(csRdExpenditures_kFirms);
-		fSumBadDebt_cFirms						= new SumArrayFunction.Double(csBadDebt_cFirms);
+		fSumRdExpenditures_kFirms 			= new SumArrayFunction.Double(csRdExpenditures_kFirms);
+		fSumBadDebt_cFirms					= new SumArrayFunction.Double(csBadDebt_cFirms);
 		
 		fSumLaborDemand_cFirms.setCheckingTime(false);
 		fSumLaborDemandForProduction_kFirms.setCheckingTime(false);
@@ -1095,10 +1119,9 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		
 		// Compute aggregate consumption
 		// Add the past consumption non-matched by the consumption-good firms' production to the current aggregate consumption
-//		consumption[1]					= demand;
 		this.consumption[1] 			= laborDemand * wage[1] + govSpending + pastConsumption * (1 + model.getInterestRate());	//Hugo's original equation
-		aggConsumption					= laborDemand * wage[1] + unemployment * wage[1] * model.getUnemploymentBenefitShare();		//This is the equation in Dosi et al. (2013) page 1754, so why do we need to add on the extra term featuring pastConsumption above???
-//		aggConsumption					= consumption[1];
+//		aggConsumption					= laborDemand * wage[1] + unemployment * wage[1] * model.getUnemploymentBenefitShare();		//This is the equation in Dosi et al. (2013) page 1754, so why do we need to add on the extra term featuring pastConsumption above???
+		aggConsumption					= consumption[1];
 		
 		log.fatal("Consumption variables: " + 
 					"\n Gov. spending " + govSpending + 
@@ -1174,6 +1197,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		fSumInvestmentSubstitutionary.updateSource();
 		fSumDemand_cFirms.updateSource();
 		fSumProfit_cFirms.updateSource();
+		fSumGrossOperatingSurplus_cFirms.updateSource();
 		fSumLiquidAssets_cFirms.updateSource();
 		
 		// Investments is expressed in terms of machines
@@ -1191,6 +1215,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		
 		// Total profit 
 		this.profit_cFirms 				= fSumProfit_cFirms.getDoubleValue(IDoubleSource.Variables.Default);
+		this.grossOperatingSurplus_cFirms 				= fSumGrossOperatingSurplus_cFirms.getDoubleValue(IDoubleSource.Variables.Default);
 		
 		// Productivity
 		this.meanProductivityWeightedByMarketShare_cFirms 		= 0; // mean prod. with weight = market share
@@ -1276,10 +1301,12 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		// Production
 		this.output 					= realConsumption + production_kFirms;
 		// GDP; equation (11) in Dosi et al. (2013)
-		this.gdp[1] 					= realConsumption + production_kFirms + diffTotalInventories_cFirms;
+		this.gdp[1] 					= realConsumption + production_kFirms + diffTotalInventories_cFirms;		//Note that production_kFirms = investmentTotal_cFirms.
 		this.gdpNominal					= productionNominal_kFirms + productionNominal_cFirms + diffTotalInventoriesNominal_cFirms;
 		this.gdpLog 					= Math.log(gdp[1]);
 				
+		
+		
 		// GDP growth
 		if(SimulationEngine.getInstance().getTime() > 0)
 			this.gdpGrowth 				= Math.log(gdp[1]) - Math.log(gdp[0]);
@@ -1394,7 +1421,41 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		changeInInventoriesValueToYcin = diffTotalInventoriesNominal_cFirms / Ycin;
 		
 
+//		Expenditure approach of GDP:
+//			GDP = consumption + gross investment, 
+//		where investment includes investment in machines ("fixed investment") and investment in inventories. Note that gross investment and not net investment (net of depreciation) should be considered.
+//		Note that banks here do not play any role, as they do not sell services to consumers nor they invest (in our simple economy).
+		grossInvestment = investmentTotal_cFirms[1] + diffTotalInventories_cFirms;	//Note investmentTotal_cFirms = production_kFirms.
+		gdpEx = realConsumption + grossInvestment;
+		consumptionToGDPex = realConsumption / gdpEx;
+		investmentToGDPex = grossInvestment / gdpEx;
 		
+		
+//		Cost/income approach of GDP:		
+//			GDP = wages + interests + profits (all before taxes) + depreciation
+//		Depreciation is included because this is one of the "destinations" GDP could go to, i.e. covering for losses in capital. 
+//		Profits are computed as 
+//			profits = sales (to the market) - cost of production
+//		where
+//			costs = purchases of intermediate goods and services (null in our case) +  wages + interests - delta(inventories) + depreciation
+//			delta(inventories) is measured as end-of-period - beginning-of-period. Note that a decrease in inventories is associated to an increase in costs, as goods are fictitiously "bought" from the deposit.
+//		Substituting, we obtain 
+//			GDP = wages + interests + sales - wages - interests + delta(inventories) - depreciation + depreciation
+//			    = value of production
+//			    = sales + delta(inventories)
+		
+		double profitsTotal = grossOperatingSurplus_cFirms + profit_kFirms;		//XXX: Cannot use profit_cFirms, as this already includes interest on deposits - interest on loans
+		double wagesTotal = wage[1] * laborDemand;
+		double interests = model.getBank().depositRevenues;						//XXX: Do we need to deduct interest on loans?
+		double depreciation = investmentSubstitutionaryTotal_cFirms;			//XXX: Use substitionary investment measure to calculate depreciation???  Is this correct?
+		gdpInc = wagesTotal + interests + profitsTotal + depreciation;			//ROSS: Not sure how to handle depreciation.  Do we use substitionary investment of cFirms?
+		wagesToGDPinc = wagesTotal / gdpInc;
+		interestToGDPinc = interests / gdpInc;
+		profitsToGDPinc = profitsTotal / gdpInc;
+		depreciationToGDPinc = depreciation / gdpInc;		
+				
+				
+				
 	}
 	
 	void dumpInStatistics(){
@@ -1437,24 +1498,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		statistics.setLiquidityToSalesRatio(meanLiquidityToSalesRatio_cFirms);
 		
 		
-		
-//		csBadDebt_cFirms.updateSource();
-//		csLiquidAssets_cFirms.updateSource();
-//		csLiquidityToSalesRatio_cFirms.updateSource();
-//		
-//		//Is this working properly???
-//		System.out.println("fSumBadDebt_cFirms.getDoubleValue(IDoubleSource.Variables.Default), " + fSumBadDebt_cFirms.getDoubleValue(IDoubleSource.Variables.Default));
-//		statistics.setBadDebt(fSumBadDebt_cFirms.getDoubleValue(IDoubleSource.Variables.Default));
-//		
-//		System.out.println("fMeanLiquidAssets_cFirms, " + fMeanLiquidAssets_cFirms.getDoubleValue(IDoubleSource.Variables.Default));
-//		System.out.println("fSumLiquidAssets_cFirms, " + fSumLiquidAssets_cFirms.getDoubleValue(IDoubleSource.Variables.Default));
-//		System.out.println("fMeanLiquidityToSalesRatio_cFirms, " + fMeanLiquidityToSalesRatio_cFirms.getDoubleValue(IDoubleSource.Variables.Default));	//XXX: This is not working properly - why?!?
-//		System.out.println("fSumLiquidityToSalesRatio_cFirms, " + fSumLiquidityToSalesRatio_cFirms.getDoubleValue(IDoubleSource.Variables.Default));	//XXX: This is not working properly - why?!?
-//		System.out.println("Mean, " + fMeanVarianceLiquidityToSalesRatio_cFirms.getDoubleValue(MeanVarianceArrayFunction.Variables.Mean));
-//		System.out.println("Variance, " + fMeanVarianceLiquidityToSalesRatio_cFirms.getDoubleValue(MeanVarianceArrayFunction.Variables.Variance));
-//		
-//		statistics.setLiquidityToSalesRatio(fMeanLiquidityToSalesRatio_cFirms.getDoubleValue(IDoubleSource.Variables.Default));
-				
+						
 		double invGrowth 				= 0;
 		if(investmentTotal_cFirms[0] != 0)
 			invGrowth 					= (investmentTotal_cFirms[1] - investmentTotal_cFirms[0]) / investmentTotal_cFirms[0];
