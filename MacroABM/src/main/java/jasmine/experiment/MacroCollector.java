@@ -265,6 +265,14 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	
 	private double depreciationToGDPinc;
 
+	private double gdpIncWithoutDep;
+
+	private double wagesToGDPincWithoutDep;
+
+	private double interestToGDPincWithoutDep;
+
+	private double profitsToGDPincWithoutDep;
+
 //	private MeanVarianceArrayFunction fMeanVarianceLiquidityToSalesRatio_cFirms;
 	
 	
@@ -563,6 +571,23 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		ProductionNominalKFirmsToYproductionPercent,
 		ProductionNominalCFirmsToYproductionPercent,
 
+		LogGdpEx,
+		ConsumptionToGDPexPercent,
+		InvestmentToGDPexPercent,
+		LogGdpInc,
+		WagesToGDPincPercent,
+		ProfitsToGDPincPercent,
+		InterestToGDPincPercent,
+		DepreciationToGDPincPercent,
+		LogGdpIncWithoutDep,
+		WagesToGDPincWithoutDepPercent,
+		InterestToGDPincWithoutDepPercent,
+		ProfitsToGDPincWithoutDepPercent,
+		GdpExToGdpInc,
+		GdpExToGdpIncWithoutDep,
+
+		
+		
 		LogAggregateDemand,
 
 	}
@@ -895,6 +920,57 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return 100. * productionNominalKFirmsToYproduction; 
 		case ProductionNominalCFirmsToYproductionPercent:
 			return 100. * productionNominalCFirmsToYproduction;
+						
+		case LogGdpEx:
+			if(gdpEx > 0.)
+				return Math.log(gdpEx);
+			else return Double.NaN;
+		case ConsumptionToGDPexPercent:
+			return 100. * consumptionToGDPex;
+		case InvestmentToGDPexPercent:
+			return 100. * investmentToGDPex;
+		case LogGdpInc:
+			if(gdpInc > 0.)
+				return Math.log(gdpInc);
+			else return Double.NaN;
+		case WagesToGDPincPercent:
+			return 100. * wagesToGDPinc;
+		case ProfitsToGDPincPercent:
+			return 100. * profitsToGDPinc;
+		case InterestToGDPincPercent:
+			return 100. * interestToGDPinc;
+		case DepreciationToGDPincPercent:
+			return 100. * depreciationToGDPinc;
+		case LogGdpIncWithoutDep:
+			if(gdpIncWithoutDep > 0.)
+				return Math.log(gdpIncWithoutDep);
+			else return Double.NaN;
+		case WagesToGDPincWithoutDepPercent:
+			return 100. * wagesToGDPincWithoutDep;
+		case InterestToGDPincWithoutDepPercent:
+			return 100. * interestToGDPincWithoutDep;
+		case ProfitsToGDPincWithoutDepPercent:
+			return 100. * profitsToGDPincWithoutDep;
+		case GdpExToGdpInc:
+			if(gdpInc > 0.)
+				return gdpEx / gdpInc;
+			else return Double.NaN;
+		case GdpExToGdpIncWithoutDep:
+			if(gdpIncWithoutDep > 0.)
+				return gdpEx / gdpIncWithoutDep;
+			else return Double.NaN;
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 		case LogAggregateDemand:
 			if(initialAggregateDemand > 0.)
 				return Math.log(initialAggregateDemand);
@@ -1444,15 +1520,21 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 //			    = value of production
 //			    = sales + delta(inventories)
 		
-		double profitsTotal = grossOperatingSurplus_cFirms + profit_kFirms;		//XXX: Cannot use profit_cFirms, as this already includes interest on deposits - interest on loans
+		double profitsTotal = grossOperatingSurplus_cFirms + profit_kFirms + model.getBank().profit;		//XXX: Cannot use profit_cFirms, as this already includes interest on deposits - interest on loans.  Note that the negative of this term is actually the Bank's profit which we include here, because the return on deposits and loans is different.
 		double wagesTotal = wage[1] * laborDemand;
 		double interests = model.getBank().depositRevenues;						//XXX: Do we need to deduct interest on loans?
-		double depreciation = investmentSubstitutionaryTotal_cFirms;			//XXX: Use substitionary investment measure to calculate depreciation???  Is this correct?
+		double depreciation = investmentSubstitutionaryTotal_cFirms;			//XXX: Use cFirms' substitionary investment measure to calculate depreciation???  Is this correct?
 		gdpInc = wagesTotal + interests + profitsTotal + depreciation;			//ROSS: Not sure how to handle depreciation.  Do we use substitionary investment of cFirms?
 		wagesToGDPinc = wagesTotal / gdpInc;
 		interestToGDPinc = interests / gdpInc;
 		profitsToGDPinc = profitsTotal / gdpInc;
-		depreciationToGDPinc = depreciation / gdpInc;		
+		depreciationToGDPinc = depreciation / gdpInc;
+
+		//Exclude depreciation (as not sure if it is correct measurement - it is currently based on substitionary investment of cFirms)
+		gdpIncWithoutDep = wagesTotal + interests + profitsTotal;
+		wagesToGDPincWithoutDep = wagesTotal / gdpIncWithoutDep;
+		interestToGDPincWithoutDep = interests / gdpIncWithoutDep;
+		profitsToGDPincWithoutDep = profitsTotal / gdpIncWithoutDep;
 				
 				
 				

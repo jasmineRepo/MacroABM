@@ -48,7 +48,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 	//Boolean GUI parameter toggles to switch a particular chart on / off
 	
 	@GUIparameter(description = "Toggle to turn chart on / off")
-	private boolean newAcountingIdentities = false;
+	private boolean gdpAccountingIdentities = true;
 
 //	@GUIparameter(description = "Toggle to turn chart on / off")
 //	private boolean acountingIdentities = false;
@@ -129,44 +129,48 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 
 			
 			
-			if(newAcountingIdentities) {	
-//				Set<JInternalFrame> accountingIdentitiesPlots = new LinkedHashSet<JInternalFrame>();
-//				
-//			    TimeSeriesSimulationPlotter yPlot = new TimeSeriesSimulationPlotter("Y comparison", "Log"); 
-//				yPlot.addSeries("Y = C + I + delta_N", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogYcin));
-//				yPlot.addSeries("Y = Sum of production values", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogYproduction));
-//				updateChartSet.add(yPlot);			//Add to set to be updated in buildSchedule method
-//				accountingIdentitiesPlots.add(yPlot); 							    			    			    
-//			    
-//				TimeSeriesSimulationPlotter yComparisonPlot = new TimeSeriesSimulationPlotter("Ycin / Yproduction", ""); 
-//				yComparisonPlot.addSeries("Ycin / Yproduction", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.YcinToYproduction));
-//				updateChartSet.add(yComparisonPlot);			//Add to set to be updated in buildSchedule method
-//				accountingIdentitiesPlots.add(yComparisonPlot); 							    			    			    
-//				
-//				TimeSeriesSimulationPlotter yCINcomponentsPlot = new TimeSeriesSimulationPlotter("Components of Ycin", "%"); 
-//				yCINcomponentsPlot.addSeries("Consumption / Ycin", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionToYcinPercent));
-//				yCINcomponentsPlot.addSeries("Investment / Ycin", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InvestmentToYcinPercent));
-//				yCINcomponentsPlot.addSeries("Change in Inventories Values / Ycin", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ChangeInInventoriesValueToYcinPercent));
-//				updateChartSet.add(yCINcomponentsPlot);			//Add to set to be updated in buildSchedule method
-//				accountingIdentitiesPlots.add(yCINcomponentsPlot);
-//				
-//				TimeSeriesSimulationPlotter yProductioncomponentsPlot = new TimeSeriesSimulationPlotter("Components of Yproduction", "%"); 
-//				yProductioncomponentsPlot.addSeries("kFirms production / Yproduction", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProductionNominalKFirmsToYproductionPercent));
-//				yProductioncomponentsPlot.addSeries("cFirms production / Yproduction", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProductionNominalCFirmsToYproductionPercent));
-//				updateChartSet.add(yProductioncomponentsPlot);			//Add to set to be updated in buildSchedule method
-//				accountingIdentitiesPlots.add(yProductioncomponentsPlot); 							    			 
-//				
-//				tabSet.add(createScrollPaneFromPlots(accountingIdentitiesPlots, "Consumption Components", accountingIdentitiesPlots.size()));
+			if(gdpAccountingIdentities) {	
+				Set<JInternalFrame> newAccountingIdentitiesPlots = new LinkedHashSet<JInternalFrame>();
+				
+			    TimeSeriesSimulationPlotter gdpPlot = new TimeSeriesSimulationPlotter("GDP levels comparison", "Log"); 
+				gdpPlot.addSeries("GDP (expenditure) = Consumption + Gross Investment", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogGdpEx));
+				gdpPlot.addSeries("GDP (income) = Wages + Interest + Profits + Depreciation", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogGdpInc));
+				gdpPlot.addSeries("GDP (Income without depreciation) = Wages + Interest + Profits", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogGdpIncWithoutDep));
+				updateChartSet.add(gdpPlot);			//Add to set to be updated in buildSchedule method
+				newAccountingIdentitiesPlots.add(gdpPlot); 							    			    			    
+			    
+				TimeSeriesSimulationPlotter gdpComparisonPlot = new TimeSeriesSimulationPlotter("GDP ratios", ""); 
+				gdpComparisonPlot.addSeries("GDP: expenditure / income", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GdpExToGdpInc));
+				gdpComparisonPlot.addSeries("GDP: expenditure / income without deprecation", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.GdpExToGdpIncWithoutDep));
+				updateChartSet.add(gdpComparisonPlot);			//Add to set to be updated in buildSchedule method
+				newAccountingIdentitiesPlots.add(gdpComparisonPlot); 							    			    			    
+				
+				TimeSeriesSimulationPlotter gdpExpenditureComponentsPlot = new TimeSeriesSimulationPlotter("Components of GDP (expenditure)", "%"); 
+				gdpExpenditureComponentsPlot.addSeries("Consumption / GDPex", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ConsumptionToYcinPercent));
+				gdpExpenditureComponentsPlot.addSeries("Gross Investment / GDPex", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InvestmentToYcinPercent));
+				updateChartSet.add(gdpExpenditureComponentsPlot);			//Add to set to be updated in buildSchedule method
+				newAccountingIdentitiesPlots.add(gdpExpenditureComponentsPlot);
+				
+				TimeSeriesSimulationPlotter gdpIncomeComponentsPlot = new TimeSeriesSimulationPlotter("Components of GDP (income)", "%"); 
+				gdpIncomeComponentsPlot.addSeries("Wages / GDPinc", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.WagesToGDPincPercent));
+				gdpIncomeComponentsPlot.addSeries("Profits / GDPinc", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProfitsToGDPincPercent));
+				gdpIncomeComponentsPlot.addSeries("Interest / GDPinc", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InterestToGDPincPercent));
+				gdpIncomeComponentsPlot.addSeries("Depreciation / GDPinc", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.DepreciationToGDPincPercent));
+				updateChartSet.add(gdpIncomeComponentsPlot);			//Add to set to be updated in buildSchedule method
+				newAccountingIdentitiesPlots.add(gdpIncomeComponentsPlot); 							    			 
+
+				TimeSeriesSimulationPlotter gdpIncomeWithoutDepComponentsPlot = new TimeSeriesSimulationPlotter("Components of GDP (income without depreciation)", "%"); 
+				gdpIncomeWithoutDepComponentsPlot.addSeries("Wages / GDPincWithoutDep", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.WagesToGDPincWithoutDepPercent));
+				gdpIncomeWithoutDepComponentsPlot.addSeries("Profits / GDPincWithoutDep", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.ProfitsToGDPincWithoutDepPercent));
+				gdpIncomeWithoutDepComponentsPlot.addSeries("Interest / GDPincWithoutDep", (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.InterestToGDPincWithoutDepPercent));
+				updateChartSet.add(gdpIncomeWithoutDepComponentsPlot);			//Add to set to be updated in buildSchedule method
+				newAccountingIdentitiesPlots.add(gdpIncomeWithoutDepComponentsPlot); 							    			 
+
+				tabSet.add(createScrollPaneFromPlots(newAccountingIdentitiesPlots, "GDP Components", newAccountingIdentitiesPlots.size()));
+
+
 			}
-			
-			
-			
-			
-			
-			
-			
-			
-			
+					
 			
 //			if(acountingIdentities) {
 //				
@@ -911,14 +915,6 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 		this.inflation = inflation;
 	}
 
-	public boolean isNewAcountingIdentities() {
-		return newAcountingIdentities;
-	}
-
-	public void setNewAcountingIdentities(boolean newAcountingIdentities) {
-		this.newAcountingIdentities = newAcountingIdentities;
-	}
-
 	public boolean isFirmAssets() {
 		return firmAssets;
 	}
@@ -989,6 +985,14 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 
 	public void setcFirmsCreditRationing(boolean cFirmsCreditRationing) {
 		this.cFirmsCreditRationing = cFirmsCreditRationing;
+	}
+
+	public boolean isGdpAccountingIdentities() {
+		return gdpAccountingIdentities;
+	}
+
+	public void setGdpAccountingIdentities(boolean gdpAccountingIdentities) {
+		this.gdpAccountingIdentities = gdpAccountingIdentities;
 	}
 
 	
