@@ -667,11 +667,11 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 			i++;
 		}
 		
-		// The past consumption is the real consumption that had not been met in the allocation process
-		collector.pastConsumption 			= collector.realConsumption;
-		if(collector.pastConsumption < 0){
-			collector.pastConsumption 		= 0;
-			log.error("Past consumption < 0: " + collector.pastConsumption);
+		// The 'unfilled' consumption is the real consumption that had not been met in the allocation process
+		collector.unfilledConsumption 			= collector.realConsumption;
+		if(collector.unfilledConsumption < 0){
+			collector.unfilledConsumption 		= 0;
+			log.error("Past consumption < 0: " + collector.unfilledConsumption);
 		}
 		
 	}

@@ -303,9 +303,10 @@ public class Bank extends Agent implements IDoubleSource {
 		// If the economy has no debt, the bank is not doing any activity. Its profit is nil.
 		if(this.debtInterest == 0)
 			this.profit 						= 0;
-		else 
+		else
 			this.profit 						= debtInterest - depositRevenues;
 			// this.profit = debtRevenues - depositInterest + MacroModel.rCb * (cash + reserves);
+		
 		
 		// The government taxes the bank's profit 
 		if(profit > 0){

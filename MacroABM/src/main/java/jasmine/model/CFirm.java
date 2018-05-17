@@ -1625,7 +1625,9 @@ public class CFirm extends Firm {
 					this.demand[1] 				+= demand;
 				else if (i == 1){
 					// Unfilled demand is nil 
-					this.unfilledDemand 		= 1;		//XXX: Why is this 1 and not demand?  It seems it is to prevent divide by 0 errors.
+					this.unfilledDemand 		= 1;		//Note: When computing the competitiveness of consumption-good firms, we divide by the economy-mean unfilled demand.
+															// Default unfilled demand cannot be set equal to 0 otherwise might divide sometimes by 0
+
 				}
 				
 				// The firm's stock of final good and the real consumption decrease accordingly
@@ -1636,7 +1638,9 @@ public class CFirm extends Firm {
 				if(i > 1)
 					this.demand[1] 				+= stockFinalGood;
 				else if (i == 1)
-					this.unfilledDemand 		= 1 + demand - stockFinalGood;	//XXX Why the '1 + '?  It seems it is to prevent divide by 0 errors.
+					this.unfilledDemand 		= 1 + demand - stockFinalGood;			// Note: When computing the competitiveness of consumption-good firms, we divide by the economy-mean unfilled demand.
+																						// Default unfilled demand cannot be set equal to 0 otherwise might divide sometimes by 0
+
 				
 				// The stock of real consumption decreases accordingly
 				model.consumptionTemp 			-= stockFinalGood;

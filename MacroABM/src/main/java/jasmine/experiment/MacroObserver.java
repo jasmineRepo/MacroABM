@@ -68,6 +68,12 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 	
 	@GUIparameter(description = "Toggle to turn chart on / off")	
 	private boolean gdpConsumptionInvestment = true;
+
+	@GUIparameter(description = "Toggle to turn chart on / off")
+	private boolean earnings = true;
+	@GUIparameter(description = "Toggle to turn chart on / off")
+	private boolean unfilledDemand = true;
+
 	@GUIparameter(description = "Toggle to turn chart on / off")
 	private boolean creditActivity = true;
 	@GUIparameter(description = "Toggle to turn chart on / off")
@@ -125,8 +131,7 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 		if(charts){
 						
 			updateChartSet = new LinkedHashSet<JInternalFrame>();	//Set of all charts needed to be scheduled for updating
-			tabSet = new LinkedHashSet<JComponent>();		//Set of all JInternalFrames each having a tab.  Each tab frame will potentially contain more than one chart each.
-
+			tabSet = new LinkedHashSet<JComponent>();		//Set of all JInternalFrames each having a tab.  Each tab frame will potentially contain more than one chart each.			
 			
 			
 			if(gdpAccountingIdentities) {	
@@ -323,6 +328,27 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 	//			GuiUtils.addWindow(logOutputConsumptionInvestment, 0, 0, 300, 250);
 			}
 		    
+			
+			if(earnings) {
+				String name = "Earnings";
+				TimeSeriesSimulationPlotter logEarnings = new TimeSeriesSimulationPlotter(name, "Log");
+				logEarnings.addSeries(name, (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogEarnings));
+				logEarnings.setName(name);
+				updateChartSet.add(logEarnings);			//Add to set to be updated in buildSchedule method
+			    tabSet.add(logEarnings);
+			}
+			
+			if(unfilledDemand) {
+				String name = "Unfilled Consumption";
+				TimeSeriesSimulationPlotter logEarnings = new TimeSeriesSimulationPlotter(name, "Log");
+				logEarnings.addSeries(name, (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogUnfilledConsumption));
+				logEarnings.setName(name);
+				updateChartSet.add(logEarnings);			//Add to set to be updated in buildSchedule method
+			    tabSet.add(logEarnings);
+			}
+
+			
+			
 		    if(!dosiComparison){
 				
 			    if(creditActivity) {
@@ -993,6 +1019,22 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 
 	public void setGdpAccountingIdentities(boolean gdpAccountingIdentities) {
 		this.gdpAccountingIdentities = gdpAccountingIdentities;
+	}
+
+	public boolean isEarnings() {
+		return earnings;
+	}
+
+	public void setEarnings(boolean earnings) {
+		this.earnings = earnings;
+	}
+
+	public boolean isUnfilledDemand() {
+		return unfilledDemand;
+	}
+
+	public void setUnfilledDemand(boolean unfilledDemand) {
+		this.unfilledDemand = unfilledDemand;
 	}
 
 	
