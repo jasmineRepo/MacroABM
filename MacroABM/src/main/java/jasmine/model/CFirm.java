@@ -275,8 +275,7 @@ public class CFirm extends Firm {
 		this.costToProduceGood 							= Parameters.getInitialWage() / productivity;
 		this.priceOfGoodProduced 							= new double[]{ (1 + markUpRate[1]) * costToProduceGood, (1 + markUpRate[1]) * costToProduceGood}; 
 		// When computing the competitiveness of consumption-good firms, we divide by the economy-mean unfilled demand.
-		// Default unfilled demand cannot be set equal to 0 otherwise might divide sometimes by 0
-		this.unfilledDemand 			= 1;  
+		this.unfilledDemand 			= 0;  
 		 
 		// --- Production variables ---
 		this.sales 						= new double[]{1, 1}; 
@@ -657,7 +656,7 @@ public class CFirm extends Firm {
 		// Too-old machines 
 		for(Map.Entry<Machine, Integer> entry : machineAgeMap.entrySet()){
 			if(entry.getValue() > Parameters.getMaxAgeMachines_cFirms()){
-				// Scrapping of these machines will actually take place only if the firm has the fund to replace them. So far, only store
+				// Scrapping of these machines will actually take place only if the firm has the funds to replace them. So far, only store
 				// them in the toBeScrapped map.
 				this.machinesToBeScrappedMap.put(entry.getKey(), machineQuantityMap.get(entry.getKey()));
 				this.desiredInvestmentSubstitutionary 					+= machineQuantityMap.get(entry.getKey()).doubleValue() * Parameters.getMachineSizeInCapital_cFirms();
@@ -1625,9 +1624,7 @@ public class CFirm extends Firm {
 					this.demand[1] 				+= demand;
 				else if (i == 1){
 					// Unfilled demand is nil 
-					this.unfilledDemand 		= 1;		//Note: When computing the competitiveness of consumption-good firms, we divide by the economy-mean unfilled demand.
-															// Default unfilled demand cannot be set equal to 0 otherwise might divide sometimes by 0
-
+					this.unfilledDemand 		= 0;
 				}
 				
 				// The firm's stock of final good and the real consumption decrease accordingly
@@ -1638,9 +1635,7 @@ public class CFirm extends Firm {
 				if(i > 1)
 					this.demand[1] 				+= stockFinalGood;
 				else if (i == 1)
-					this.unfilledDemand 		= 1 + demand - stockFinalGood;			// Note: When computing the competitiveness of consumption-good firms, we divide by the economy-mean unfilled demand.
-																						// Default unfilled demand cannot be set equal to 0 otherwise might divide sometimes by 0
-
+					this.unfilledDemand 		= demand - stockFinalGood;
 				
 				// The stock of real consumption decreases accordingly
 				model.consumptionTemp 			-= stockFinalGood;
@@ -1668,7 +1663,7 @@ public class CFirm extends Firm {
 		this.profit 							= grossOperatingSurplus + depositRevenue - debtInterest;
 		this.inventories[1] 					= Math.max(0, stockFinalGood);
 		double diffN 							= inventories[1] - inventories[0];
-		collector.diffTotalInventories_cFirms 			+= diffN;
+		collector.diffTotalInventories_cFirms	+= diffN;
 		
 		double debtRepaid 						= Parameters.getDebtRepaymentSharePerPeriod_cFirms() * debt[1];
 		

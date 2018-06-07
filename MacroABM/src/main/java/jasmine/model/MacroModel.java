@@ -575,13 +575,24 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 		
 		// Compute the firms' competitiveness & the mean competitiveness
 		collector.meanCompetitiveness_cFirms[1] 				= 0;
-		for(CFirm cFirm : cFirms){
-			// Equation (24) in Dosi et al. (2013)
-			cFirm.competitiveness 						= - Parameters.getCoeffPriceCompetitiveness_cFirms() * cFirm.priceOfGoodProduced[1] / collector.meanPrice_cFirms - 
-											Parameters.getCoeffUnfilledDemandCompetitiveness_cFirms() * cFirm.unfilledDemand / collector.meanUnfilledDemand;
-			// Equation (24.5) in Dosi et al. (2013)
-			collector.meanCompetitiveness_cFirms[1] 			+= cFirm.competitiveness * cFirm.marketShare[1];
-			
+		
+		if(Double.compare(collector.meanUnfilledDemand, 0.) != 0)		//if mean unfilled demand is not 0.
+		{
+			for(CFirm cFirm : cFirms){
+				// Equation (24) in Dosi et al. (2013)
+				cFirm.competitiveness 						= - Parameters.getCoeffPriceCompetitiveness_cFirms() * cFirm.priceOfGoodProduced[1] / collector.meanPrice_cFirms - 
+												Parameters.getCoeffUnfilledDemandCompetitiveness_cFirms() * cFirm.unfilledDemand / collector.meanUnfilledDemand;
+				// Equation (24.5) in Dosi et al. (2013)
+				collector.meanCompetitiveness_cFirms[1] 			+= cFirm.competitiveness * cFirm.marketShare[1];				
+			}
+		}
+		else {			//mean unfilled demand is 0., so to prevent 0/0 errors, we ignore unfilled demand component of competitiveness:
+			for(CFirm cFirm : cFirms){
+				// Equation (24) in Dosi et al. (2013)
+				cFirm.competitiveness 						= - Parameters.getCoeffPriceCompetitiveness_cFirms() * cFirm.priceOfGoodProduced[1] / collector.meanPrice_cFirms; 
+				// Equation (24.5) in Dosi et al. (2013)
+				collector.meanCompetitiveness_cFirms[1] 			+= cFirm.competitiveness * cFirm.marketShare[1];				
+			}			
 		}
 		
 		// Compute the new firms' market share. Firms with too-low market share exit
@@ -647,10 +658,11 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 		// Allocation process
 		// NOTE: use collector.realConsumption >= 1 as a gross approximation of collector.realConsumption > 0 in order to
 		// prevent the loop to run forever  
+		
 		while(fTotTemp > 0 && collector.realConsumption >= 1){
 			this.consumptionTemp 			= collector.realConsumption;
 						
-			// Compute the respective demand for every firms
+			// Compute the respective demand for every firm
 			for(CFirm cFirm : cFirms)
 				cFirm.demand(i);
 			
@@ -665,13 +677,13 @@ public class MacroModel extends AbstractSimulationManager implements EventListen
 			
 			collector.realConsumption 		= consumptionTemp;
 			i++;
-		}
+		}		
+		// The 'unfilled' demand (consumption) is the real consumption that had not been met in the allocation process
+		collector.unfilledDemandAggregate 			= collector.realConsumption;		
 		
-		// The 'unfilled' consumption is the real consumption that had not been met in the allocation process
-		collector.unfilledConsumption 			= collector.realConsumption;
-		if(collector.unfilledConsumption < 0){
-			collector.unfilledConsumption 		= 0;
-			log.error("Past consumption < 0: " + collector.unfilledConsumption);
+		if(collector.unfilledDemandAggregate < 0){
+			collector.unfilledDemandAggregate 		= 0;
+			log.error("Past consumption < 0: " + collector.unfilledDemandAggregate);
 		}
 		
 	}

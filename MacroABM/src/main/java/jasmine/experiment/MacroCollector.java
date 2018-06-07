@@ -87,7 +87,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 //	public double aggregateDemand;
 	public double[] consumption;
 	public double realConsumption;
-	public double unfilledConsumption; // consumption (demand) not able to be fulfilled in t by CFirms that will come back in (t+1)
+	public double unfilledDemandAggregate; // consumption (demand) not able to be fulfilled in t by CFirms that will come back in (t+1)
 	// the two following variables are mainly used for the computation of the c-firms' competitiveness and market share 
 	public double[] cpi; // consumer price index (price of cFirms)
 	
@@ -476,7 +476,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		LogGDP,
 		LogTotalInvestment,
 //		ConsumptionLog,
-		LogUnfilledConsumption,
+		LogUnfilledDemandAggregate,
 		LogRealConsumption,
 		ConsumptionToGDPpercent,
 		InvestmentToGDPpercent,
@@ -803,9 +803,9 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 				return Math.log(realConsumption);
 			else return Double.NaN;
 			
-		case LogUnfilledConsumption:
-			if(unfilledConsumption > 0.)
-				return Math.log(unfilledConsumption);
+		case LogUnfilledDemandAggregate:
+			if(unfilledDemandAggregate > 0.)
+				return Math.log(unfilledDemandAggregate);
 			else return Double.NaN;
 			
 		case InvestmentToGDPpercent:
@@ -1057,7 +1057,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		this.exit_cFirms 					= 0;
 		
 		this.consumption 			= new double[]{0, 0};
-		this.unfilledConsumption 		= 0;
+		this.unfilledDemandAggregate 		= 0;
 		this.diffTotalInventories_cFirms 					= 0;
 		
 		// Recall: [0] = t-2, [1] = t-1, [0] = t????????
@@ -1201,12 +1201,12 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		// Compute aggregate consumption
 		// Add the past consumption non-matched by the consumption-good firms' production to the current aggregate consumption
 		this.earnings					= (laborDemand * wage[1]) + (unemployment * wage[1] * model.getUnemploymentBenefitShare());
-		this.consumption[1] 			= earnings + unfilledConsumption * (1 + model.getInterestRate());
+		this.consumption[1] 			= earnings + unfilledDemandAggregate * (1 + model.getInterestRate());
 		aggConsumption					= consumption[1];
 		
 		log.fatal("Consumption variables: " + 
 					"\n Gov. spending " + govSpending + 
-					"\n past unfilled consumption " + unfilledConsumption + 
+					"\n past unfilled consumption " + unfilledDemandAggregate + 
 					"\n total consumption " + consumption[1]);
 		
 	}
@@ -1378,7 +1378,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		
 		// Consumption 
 		this.realConsumption 			= consumption[1] / cpi[1];
-		this.realConsumption 			-= unfilledConsumption;
+		this.realConsumption 			-= unfilledDemandAggregate;
 		// Production
 		this.output 					= realConsumption + production_kFirms;
 		// GDP; equation (11) in Dosi et al. (2013)
@@ -1502,6 +1502,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		changeInInventoriesValueToYcin = diffTotalInventoriesNominal_cFirms / Ycin;
 		
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//		
 //		Expenditure approach of GDP:
 //			GDP = consumption + gross investment, 
 //		where investment includes investment in machines ("fixed investment") and investment in inventories. Note that gross investment and not net investment (net of depreciation) should be considered.

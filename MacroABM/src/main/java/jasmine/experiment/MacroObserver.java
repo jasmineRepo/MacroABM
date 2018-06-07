@@ -339,9 +339,9 @@ public class MacroObserver extends AbstractSimulationObserverManager implements 
 			}
 			
 			if(unfilledDemand) {
-				String name = "Unfilled Consumption";
+				String name = "Unfilled Aggregate Demand";
 				TimeSeriesSimulationPlotter logEarnings = new TimeSeriesSimulationPlotter(name, "Log");
-				logEarnings.addSeries(name, (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogUnfilledConsumption));
+				logEarnings.addSeries(name, (IDoubleSource) new MultiTraceFunction.Double(collector, MacroCollector.Variables.LogUnfilledDemandAggregate));
 				logEarnings.setName(name);
 				updateChartSet.add(logEarnings);			//Add to set to be updated in buildSchedule method
 			    tabSet.add(logEarnings);
