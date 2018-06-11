@@ -85,8 +85,8 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	// Goods market
 	public double initialAggregateDemand;
 //	public double aggregateDemand;
-	public double[] consumption;
-	public double realConsumption;
+	public double[] consumption;					//'Nominal' variable
+	public double realConsumption;					//'Real' variable
 	public double unfilledDemandAggregate; // consumption (demand) not able to be fulfilled in t by CFirms that will come back in (t+1)
 	// the two following variables are mainly used for the computation of the c-firms' competitiveness and market share 
 	public double[] cpi; // consumer price index (price of cFirms)
@@ -119,11 +119,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	
 	// Macroeconomic variables 
 	public double[] averageLaborProductivity; // mean productivity in consumption-sector, was averageLaborProd.
-	public double output;
-	public double[] gdp;
-	public double gdpLog;
-	public double gdpNominal; // gdp nominal, was gdpNom.
-	public double gdpGrowth; 
+	public double output;				//'Real' variable
+	public double[] gdp;				//'Real' variable
+	public double gdpNominal;			// gdp nominal, was gdpNom.	Nominal variable.
+	public double gdpGrowth;			
 	public double totalFactorProductivity; // total factor productivity, was tfp. 
 	public double totalInventories; // total inventories, was nTot; TODO: can remove
 	public double diffTotalInventories_cFirms; // difference in inventories, was diffN. 
@@ -241,7 +240,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 
 	private double investmentToYcin;
 
-	private double changeInInventoriesValueToYcin;
+	private double changeInInventoriesNominalToYcin;
 
 	private double productionNominalKFirmsToYproduction;
 
@@ -590,7 +589,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 
 		
 		
-		LogAggregateDemand, 
+		LogInitialAggregateDemand, 
 		LogEarnings,
 
 	}
@@ -791,7 +790,10 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			return 100. * unemploymentRate[1];
 			
 		case LogGDP:
-			return gdpLog;
+			if(gdp[1] > 0.) {
+				return Math.log(gdp[1]);
+			}
+			else return Double.NaN;
 			
 		case ConsumptionToGDPpercent:
 			return 100. * aggConsumption / gdpNominal;
@@ -918,7 +920,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		case InvestmentToYcinPercent:
 			return 100. * investmentToYcin;
 		case ChangeInInventoriesValueToYcinPercent:
-			return 100. * changeInInventoriesValueToYcin;
+			return 100. * changeInInventoriesNominalToYcin;
 		case ProductionNominalKFirmsToYproductionPercent:
 			return 100. * productionNominalKFirmsToYproduction; 
 		case ProductionNominalCFirmsToYproductionPercent:
@@ -974,7 +976,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 			
 			
 			
-		case LogAggregateDemand:
+		case LogInitialAggregateDemand:
 			if(initialAggregateDemand > 0.)
 				return Math.log(initialAggregateDemand);
 			else return Double.NaN;
@@ -1384,7 +1386,6 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		// GDP; equation (11) in Dosi et al. (2013)
 		this.gdp[1] 					= realConsumption + production_kFirms + diffTotalInventories_cFirms;		//Note that production_kFirms = investmentTotal_cFirms.
 		this.gdpNominal					= productionNominal_kFirms + productionNominal_cFirms + diffTotalInventoriesNominal_cFirms;
-		this.gdpLog 					= Math.log(gdp[1]);
 				
 		
 		
@@ -1499,7 +1500,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 		Ycin		= aggConsumption + investmentTotal_cFirms[1] + diffTotalInventoriesNominal_cFirms;
 		consumptionToYcin = aggConsumption / Ycin;
 		investmentToYcin = investmentTotal_cFirms[1] / Ycin;
-		changeInInventoriesValueToYcin = diffTotalInventoriesNominal_cFirms / Ycin;
+		changeInInventoriesNominalToYcin = diffTotalInventoriesNominal_cFirms / Ycin;
 		
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
