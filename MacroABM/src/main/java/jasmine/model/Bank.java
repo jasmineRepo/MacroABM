@@ -328,7 +328,7 @@ public class Bank extends Agent implements IDoubleSource {
 		
 		if(equity < 0){ // FIXME: should not the bank first pay with its own fund the bad debt, and only afterwards
 			// the government steps in ?
-			collector.bankDifficulty			= 1;
+			collector.bankDifficulty			= true;
 			// The bank has difficulty to cover its loss with its own liquidity. The government steps in, 
 			// first to cover the bad debt 
 			this.equity 						+= badDebt;

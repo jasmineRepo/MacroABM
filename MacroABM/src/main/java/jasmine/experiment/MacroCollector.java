@@ -51,7 +51,7 @@ public class MacroCollector extends AbstractSimulationCollectorManager implement
 	private MacroStatistics statistics;
 	
 //	public int flag;		//XXX: This field doesn't seem to be updated with any value other than 0 at the beginning, so I will comment out.
-	public int bankDifficulty;
+	public boolean bankDifficulty;
 	
 	// Here are put together all the macro variables 
 	
