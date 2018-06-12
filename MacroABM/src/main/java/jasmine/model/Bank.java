@@ -371,7 +371,7 @@ public class Bank extends Agent implements IDoubleSource {
 //			 }
 //			 this.badDebt						= 0;
 
-			collector.bankDifficulty			= 0;
+			collector.bankDifficulty			= false;
 		}
 		
 	}
