@@ -20,12 +20,12 @@
 		<dependency>
 			<groupId>com.github.jasmineRepo</groupId>
 			<artifactId>JAS-mine-core</artifactId>
-			<version>4.0.4</version>
+			<version>4.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jasmineRepo</groupId>
 			<artifactId>JAS-mine-gui</artifactId>
-			<version>4.0.4.1</version>
+			<version>4.0.5</version>
 		</dependency>
 			<!-- https://mvnrepository.com/artifact/com.miglayout/miglayout -->
 		<dependency>
